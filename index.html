@@ -1,1567 +1,1705 @@
-part1 = '''<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Analyse Fonctionnelle - Cours Interactif</title>
+<title>Espaces de Banach — Cours Interactif</title>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;600&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-    color: #eee; min-height: 100vh;
-}
-header {
-    background: linear-gradient(90deg, #e94560, #ff6b6b);
-    padding: 20px; text-align: center;
-    box-shadow: 0 4px 20px rgba(233, 69, 96, 0.4);
-    position: sticky; top: 0; z-index: 1000;
-}
-header h1 { font-size: 2.5em; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); margin-bottom: 10px; }
-nav {
-    background: rgba(0,0,0,0.3); padding: 15px;
-    display: flex; justify-content: center; flex-wrap: wrap; gap: 10px;
-    backdrop-filter: blur(10px);
-}
-nav button {
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    border: none; color: white; padding: 12px 24px;
-    border-radius: 25px; cursor: pointer; font-size: 1em; font-weight: bold;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-}
-nav button:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5); }
-nav button.active { background: linear-gradient(135deg, #e94560, #ff6b6b); }
-main { max-width: 1400px; margin: 0 auto; padding: 30px; }
-.chapter { display: none; animation: fadeIn 0.5s ease; }
-.chapter.active { display: block; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-.card {
-    background: rgba(255,255,255,0.05); border-radius: 20px; padding: 30px;
-    margin-bottom: 30px; border: 1px solid rgba(255,255,255,0.1);
-    backdrop-filter: blur(10px); box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-}
-.card h2 { color: #e94560; font-size: 1.8em; margin-bottom: 20px; border-bottom: 2px solid #e94560; padding-bottom: 10px; }
-.card h3 { color: #667eea; font-size: 1.4em; margin: 20px 0 15px 0; }
-.formula {
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
-    border-left: 4px solid #667eea; padding: 20px; margin: 20px 0;
-    border-radius: 0 15px 15px 0; font-family: 'Courier New', monospace;
-    font-size: 1.2em; overflow-x: auto;
-}
-.formula-box {
-    background: rgba(0,0,0,0.3); padding: 20px; border-radius: 15px;
-    margin: 15px 0; text-align: center; font-size: 1.3em;
-    font-family: 'Times New Roman', serif;
-    border: 1px solid rgba(102, 126, 234, 0.3);
-}
-.canvas-container {
-    background: rgba(0,0,0,0.3); border-radius: 20px; padding: 20px;
-    margin: 20px 0; text-align: center;
-}
-.canvas-container h4 { color: #e94560; margin-bottom: 15px; font-size: 1.3em; }
-canvas { border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); max-width: 100%; }
-.controls {
-    display: flex; justify-content: center; gap: 15px;
-    margin: 20px 0; flex-wrap: wrap;
-}
-.controls input[type="range"] { width: 200px; accent-color: #e94560; }
-.controls label { font-weight: bold; color: #667eea; }
-.controls button {
-    background: linear-gradient(135deg, #e94560, #ff6b6b);
-    border: none; color: white; padding: 10px 20px;
-    border-radius: 20px; cursor: pointer; font-weight: bold; transition: all 0.3s;
-}
-.controls button:hover { transform: scale(1.05); }
-.info-box {
-    background: linear-gradient(135deg, rgba(233, 69, 96, 0.1), rgba(255, 107, 107, 0.1));
-    border: 2px solid #e94560; border-radius: 15px; padding: 20px; margin: 20px 0;
-}
-.info-box h4 { color: #e94560; margin-bottom: 10px; }
-.example-box {
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
-    border: 2px solid #667eea; border-radius: 15px; padding: 20px; margin: 20px 0;
-}
-.example-box h4 { color: #667eea; margin-bottom: 10px; }
-table {
-    width: 100%; border-collapse: collapse; margin: 20px 0;
-    border-radius: 15px; overflow: hidden;
-}
-th { background: linear-gradient(135deg, #667eea, #764ba2); padding: 15px; text-align: left; font-size: 1.1em; }
-td { background: rgba(255,255,255,0.05); padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-tr:hover td { background: rgba(255,255,255,0.1); }
-.exercise {
-    background: rgba(255, 193, 7, 0.1); border: 2px solid #ffc107;
-    border-radius: 20px; padding: 30px; margin: 30px 0;
-}
-.exercise h3 { color: #ffc107; }
-.exercise input {
-    background: rgba(0,0,0,0.3); border: 2px solid #ffc107;
-    color: white; padding: 10px 15px; border-radius: 10px;
-    font-size: 1em; margin: 10px 5px;
-}
-.exercise button {
-    background: #ffc107; color: #1a1a2e; border: none;
-    padding: 12px 25px; border-radius: 10px; cursor: pointer;
-    font-weight: bold; font-size: 1em; transition: all 0.3s;
-}
-.exercise button:hover { transform: scale(1.05); box-shadow: 0 4px 15px rgba(255, 193, 7, 0.4); }
-.result { margin-top: 15px; padding: 15px; border-radius: 10px; font-weight: bold; }
-.result.correct { background: rgba(40, 167, 69, 0.2); border: 2px solid #28a745; color: #28a745; }
-.result.wrong { background: rgba(220, 53, 69, 0.2); border: 2px solid #dc3545; color: #dc3545; }
-footer { background: rgba(0,0,0,0.3); text-align: center; padding: 30px; margin-top: 50px; }
-@media (max-width: 768px) {
-    header h1 { font-size: 1.8em; }
-    .card { padding: 20px; }
-    nav button { padding: 10px 15px; font-size: 0.9em; }
-}
+  :root {
+    --ink: #1a1209;
+    --paper: #fdf6e3;
+    --paper2: #f5edcf;
+    --accent: #c0392b;
+    --accent2: #2471a3;
+    --accent3: #1e8449;
+    --gold: #d4ac0d;
+    --border: #c8b89a;
+    --shadow: rgba(100,70,30,0.18);
+    --note-bg: #fffbe6;
+    --grid: #e8dfc8;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--paper);
+    font-family: 'EB Garamond', Georgia, serif;
+    color: var(--ink);
+    font-size: 17px;
+    line-height: 1.75;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 2.5rem 2rem 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 28px, rgba(255,255,255,0.04) 28px, rgba(255,255,255,0.04) 29px);
+  }
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.8rem;
+    letter-spacing: 0.02em;
+    position: relative;
+  }
+  header h1 span { color: var(--gold); }
+  header p { font-style: italic; opacity: 0.7; margin-top: 0.4rem; position: relative; }
+
+  /* NAV */
+  nav {
+    background: var(--paper2);
+    border-bottom: 2px solid var(--border);
+    padding: 0.7rem 1rem;
+    display: flex; flex-wrap: wrap; gap: 0.5rem;
+    justify-content: center;
+    position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 2px 8px var(--shadow);
+  }
+  nav a {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--accent2);
+    text-decoration: none;
+    padding: 0.3rem 0.8rem;
+    border: 1px solid var(--accent2);
+    border-radius: 2px;
+    transition: all 0.2s;
+  }
+  nav a:hover { background: var(--accent2); color: white; }
+
+  /* MAIN LAYOUT */
+  main { max-width: 1300px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+  /* SECTION */
+  .section {
+    margin-bottom: 4rem;
+    opacity: 0; transform: translateY(24px);
+    transition: all 0.6s ease;
+  }
+  .section.visible { opacity: 1; transform: none; }
+
+  .section-header {
+    display: flex; align-items: center; gap: 1rem;
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 0.5rem;
+    margin-bottom: 2rem;
+  }
+  .section-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem;
+    color: var(--accent);
+    font-weight: 900;
+    line-height: 1;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+  }
+
+  /* CARD LAYOUT: figure + explanation side by side */
+  .card {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    border: 1.5px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 4px 4px 0 var(--shadow);
+    margin-bottom: 2.5rem;
+    background: white;
+  }
+  .card.full { grid-template-columns: 1fr; }
+  .card-viz {
+    background: var(--paper);
+    border-right: 1.5px solid var(--border);
+    padding: 1.5rem;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    min-height: 320px;
+    position: relative;
+  }
+  .card-viz canvas, .card-viz svg { max-width: 100%; display: block; }
+  .card-explain {
+    padding: 1.8rem 2rem;
+    background: white;
+  }
+  .card-explain h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    color: var(--accent);
+    margin-bottom: 0.7rem;
+    border-left: 3px solid var(--accent);
+    padding-left: 0.7rem;
+  }
+  .card-explain p { margin-bottom: 0.8rem; font-size: 0.96rem; }
+  .card-explain .formula {
+    background: var(--paper);
+    border: 1px solid var(--border);
+    padding: 0.5rem 1rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    border-radius: 3px;
+    margin: 0.5rem 0;
+    color: var(--accent2);
+  }
+  .card-explain ul { padding-left: 1.5rem; font-size: 0.94rem; }
+  .card-explain ul li { margin-bottom: 0.3rem; }
+
+  /* DEF BOX */
+  .def-box {
+    background: #eaf4fb;
+    border-left: 4px solid var(--accent2);
+    padding: 1rem 1.4rem;
+    margin-bottom: 1rem;
+    border-radius: 0 4px 4px 0;
+    font-size: 0.95rem;
+  }
+  .def-box strong { color: var(--accent2); }
+
+  .thm-box {
+    background: #fef9e7;
+    border-left: 4px solid var(--gold);
+    padding: 1rem 1.4rem;
+    margin-bottom: 1rem;
+    border-radius: 0 4px 4px 0;
+    font-size: 0.95rem;
+  }
+  .thm-box strong { color: #b7950b; }
+
+  .ex-box {
+    background: #eafaf1;
+    border-left: 4px solid var(--accent3);
+    padding: 1rem 1.4rem;
+    margin-bottom: 1rem;
+    border-radius: 0 4px 4px 0;
+    font-size: 0.94rem;
+  }
+  .ex-box strong { color: var(--accent3); }
+
+  /* INTERACTIVE CONTROLS */
+  .controls {
+    display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center;
+    margin-top: 0.7rem;
+    font-size: 0.82rem;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .controls label { color: var(--ink); opacity: 0.8; }
+  .controls input[type=range] { width: 110px; accent-color: var(--accent2); }
+  .controls select {
+    padding: 0.2rem 0.5rem;
+    border: 1px solid var(--border);
+    background: white;
+    font-family: inherit;
+    font-size: 0.8rem;
+    border-radius: 2px;
+  }
+  .controls button {
+    padding: 0.25rem 0.8rem;
+    background: var(--accent2);
+    color: white;
+    border: none; cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    border-radius: 2px;
+    transition: background 0.2s;
+  }
+  .controls button:hover { background: var(--ink); }
+
+  .viz-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: #888;
+    margin-top: 0.4rem;
+    text-align: center;
+  }
+
+  /* LEGEND */
+  .legend { display: flex; flex-wrap: wrap; gap: 0.8rem; margin-top: 0.5rem; font-size: 0.78rem; font-family: 'JetBrains Mono', monospace; }
+  .legend-item { display: flex; align-items: center; gap: 0.3rem; }
+  .legend-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+
+  /* FOOTER */
+  footer {
+    text-align: center;
+    padding: 1.5rem;
+    font-size: 0.8rem;
+    color: #aaa;
+    border-top: 1px solid var(--border);
+    font-style: italic;
+  }
+
+  @media (max-width: 800px) {
+    .card { grid-template-columns: 1fr; }
+    .card-viz { border-right: none; border-bottom: 1.5px solid var(--border); }
+    header h1 { font-size: 1.8rem; }
+  }
 </style>
 </head>
 <body>
 
 <header>
-    <h1>Analyse Fonctionnelle</h1>
-    <p>Espaces de Banach, Differentielles, et Applications</p>
+  <h1>Espaces de <span>Banach</span></h1>
+  <p>Cours interactif — Analyse Fonctionnelle · Topologie des espaces normés</p>
 </header>
 
 <nav>
-    <button onclick="showChapter(0)" class="active" id="btn0">Chap 1: Espaces Normes</button>
-    <button onclick="showChapter(1)" id="btn1">Chap 2: Differentielle</button>
-    <button onclick="showChapter(2)" id="btn2">Chap 3: Derivees Directionnelles</button>
-    <button onclick="showChapter(3)" id="btn3">Chap 4: Norme Operateur</button>
-    <button onclick="showChapter(4)" id="btn4">Chap 5: Fonctions Implicites</button>
-    <button onclick="showChapter(5)" id="btn5">Exercices</button>
+  <a href="#s1">I. Espaces Normés</a>
+  <a href="#s2">II. Normes Équivalentes</a>
+  <a href="#s3">III. Boules Unitaires</a>
+  <a href="#s4">IV. Suites de Cauchy</a>
+  <a href="#s5">V. Complétude</a>
+  <a href="#s6">VI. Topologie</a>
+  <a href="#s7">VII. Applications Continues</a>
+  <a href="#s8">VIII. Exemples Classiques</a>
 </nav>
 
 <main>
-'''
 
-with open('/mnt/agents/output/analyse_part1.html', 'w', encoding='utf-8') as f:
-    f.write(part1)
+<!-- ============================================================ -->
+<!-- SECTION I — ESPACE VECTORIEL NORMÉ -->
+<!-- ============================================================ -->
+<div class="section" id="s1">
+  <div class="section-header">
+    <span class="section-num">I</span>
+    <span class="section-title">Espaces Vectoriels Normés</span>
+  </div>
 
-print("Part 1 written successfully")
-print(f"Length: {len(part1)} characters")
-part2 = '''
-<!-- ==================== CHAPITRE 1: ESPACES NORMES ==================== -->
-<div class="chapter active" id="chap0">
-    
-    <div class="card">
-        <h2>I. Espaces Vectoriels Normes</h2>
-        
-        <h3>1. Definition</h3>
-        <p>Une <strong>norme</strong> sur le K-espace vectoriel E est une application N: E -> R+ verifiant:</p>
-        
-        <div class="formula">
-            i) N(x) = 0  &lt;=&gt;  x = 0_E  (Separation)<br>
-            ii) N(lambda*x) = |lambda| * N(x)  (Homogeneite)<br>
-            iii) N(x + y) &lt;= N(x) + N(y)  (Inegalite triangulaire)
-        </div>
-        
-        <div class="canvas-container">
-            <h4>Visualisation: Les 3 normes usuelles sur R2</h4>
-            <canvas id="normCanvas" width="600" height="400"></canvas>
-            <div class="controls">
-                <button onclick="drawNorm(1)">Norme 1 (Losange)</button>
-                <button onclick="drawNorm(2)">Norme 2 (Cercle)</button>
-                <button onclick="drawNorm('inf')">Norme inf (Carre)</button>
-                <button onclick="animateNorms()">Animation</button>
-            </div>
-        </div>
-        
-        <h3>2. Exemples de Normes</h3>
-        <table>
-            <tr><th>Norme</th><th>Formule</th><th>Forme geometrique</th></tr>
-            <tr><td>||.||_1</td><td>sum |x_i|</td><td>Losange (diamant)</td></tr>
-            <tr><td>||.||_2</td><td>sqrt(sum x_i^2)</td><td>Cercle</td></tr>
-            <tr><td>||.||_p</td><td>(sum |x_i|^p)^(1/p)</td><td>Entre losange et carre</td></tr>
-            <tr><td>||.||_inf</td><td>max |x_i|</td><td>Carre</td></tr>
-        </table>
-        
-        <div class="info-box">
-            <h4>Contre-exemple important</h4>
-            <p>Sur E = C([0,1], R), l'application N(f) = |f(0)| <strong>n'est PAS une norme</strong> car elle ne verifie pas la separation: f(x) = x verifie N(f) = 0 mais f != 0.</p>
-        </div>
+  <div class="def-box">
+    <strong>Définition.</strong> Une <em>norme</em> sur un espace vectoriel E (sur ℝ ou ℂ) est une application
+    N : E → ℝ⁺ vérifiant trois axiomes fondamentaux.
+  </div>
+
+  <!-- CARD 1: Axiomes de la norme -->
+  <div class="card">
+    <div class="card-viz">
+      <canvas id="c-norm-axioms" width="380" height="280"></canvas>
+      <div class="viz-label">Visualisation géométrique des axiomes</div>
+      <div class="controls">
+        <label>Vecteur u:</label>
+        <input type="range" id="ax-u" min="0.5" max="3" step="0.1" value="1.5">
+        <label>λ:</label>
+        <input type="range" id="ax-lam" min="-2.5" max="2.5" step="0.1" value="1.5">
+      </div>
     </div>
-    
-    <div class="card">
-        <h2>II. Topologie des Espaces Normes</h2>
-        
-        <h3>1. Boules et Ouverts</h3>
-        
-        <div class="formula-box">
-            Boule ouverte: B(x, r) = {y in E : ||y - x|| &lt; r}<br>
-            Boule fermee: B'(x, r) = {y in E : ||y - x|| &lt;= r}
-        </div>
-        
-        <div class="canvas-container">
-            <h4>Visualisation: Boule ouverte vs fermee</h4>
-            <canvas id="ballCanvas" width="600" height="400"></canvas>
-            <div class="controls">
-                <label>Rayon r: <input type="range" id="radiusSlider" min="20" max="150" value="80" oninput="drawBall()"></label>
-                <button onclick="toggleBallType()">Basculer Ouvert/Ferme</button>
-            </div>
-        </div>
-        
-        <div class="example-box">
-            <h4>Proposition: Toute boule ouverte est un ouvert</h4>
-            <p>Preuve: Soit B = B(x,r) avec r &gt; 0. Soit y in B, on pose r' = r - ||x-y|| &gt; 0.</p>
-            <p>Alors B(y, r') est contenue dans B, donc B est un ouvert.</p>
-        </div>
+    <div class="card-explain">
+      <h3>Les 3 Axiomes d'une Norme</h3>
+      <p>Une application N : E → ℝ⁺ est une norme si et seulement si :</p>
+      <div class="formula">① N(x) ≥ 0  et  N(x) = 0 ⟺ x = 0</div>
+      <p><strong>Séparation :</strong> Seul le vecteur nul a une norme égale à zéro. La norme mesure la "taille" non nulle de tout vecteur non nul.</p>
+      <div class="formula">② N(λx) = |λ| · N(x)  ∀λ ∈ ℝ, ∀x ∈ E</div>
+      <p><strong>Homogénéité :</strong> Multiplier un vecteur par un scalaire λ multiplie sa norme par |λ|. L'échelle est absolue.</p>
+      <div class="formula">③ N(x+y) ≤ N(x) + N(y)</div>
+      <p><strong>Inégalité triangulaire :</strong> Le chemin direct est toujours plus court (ou égal) que le détour par un point intermédiaire.</p>
     </div>
-    
-    <div class="card">
-        <h2>III. Convergence et Continuite</h2>
-        
-        <h3>1. Suite convergente</h3>
-        <div class="formula-box">
-            (x_n) tend vers l si: forall epsilon &gt; 0, exists N, forall n &gt;= N: ||x_n - l|| &lt; epsilon
-        </div>
-        
-        <h3>2. Application continue</h3>
-        <div class="formula-box">
-            f est continue en x_0 si: forall epsilon &gt; 0, exists eta &gt; 0:<br>
-            ||x - x_0|| &lt; eta  =&gt;  ||f(x) - f(x_0)|| &lt; epsilon
-        </div>
-        
-        <div class="canvas-container">
-            <h4>Animation: Suite convergente</h4>
-            <canvas id="convergenceCanvas" width="600" height="300"></canvas>
-            <div class="controls">
-                <button onclick="startConvergence()">Lancer animation</button>
-                <button onclick="resetConvergence()">Reinitialiser</button>
-            </div>
-        </div>
+  </div>
+
+  <!-- CARD 2: Normes classiques sur ℝⁿ -->
+  <div class="card">
+    <div class="card-viz">
+      <canvas id="c-norms-rn" width="380" height="300"></canvas>
+      <div class="viz-label">Boules unité pour différentes normes sur ℝ²</div>
+      <div class="controls">
+        <label>p =</label>
+        <input type="range" id="p-val" min="1" max="10" step="0.1" value="2">
+        <span id="p-display" style="font-family:monospace;font-size:0.85rem;color:var(--accent)">2.0</span>
+      </div>
+      <div class="legend">
+        <span class="legend-item"><span class="legend-dot" style="background:#c0392b"></span>‖·‖₁</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#2471a3"></span>‖·‖₂</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#1e8449"></span>‖·‖∞</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#8e44ad"></span>‖·‖ₚ</span>
+      </div>
     </div>
-    
-    <div class="card">
-        <h2>IV. Espaces Complets (Banach)</h2>
-        
-        <h3>1. Suite de Cauchy</h3>
-        <div class="formula-box">
-            (x_n) est de Cauchy si: forall epsilon &gt; 0, exists N, forall p,q &gt;= N:<br>
-            ||x_p - x_q|| &lt;= epsilon
-        </div>
-        
-        <h3>2. Espace de Banach</h3>
-        <div class="info-box">
-            <h4>Definition</h4>
-            <p>Un espace norme (E, ||.||) est un <strong>espace de Banach</strong> (ou e.v.n. complet) si toute suite de Cauchy est convergente.</p>
-        </div>
-        
-        <div class="example-box">
-            <h4>Exercice resolu: R^m avec ||.||_1 est un Banach</h4>
-            <p>Solution: Soit (x_n) une suite de Cauchy dans R^m.</p>
-            <p>Alors pour chaque coordonnee i, (x_n^i) est de Cauchy dans R.</p>
-            <p>Comme R est complet, x_n^i -&gt; l^i, donc x_n -&gt; l dans R^m.</p>
-        </div>
-        
-        <div class="info-box">
-            <h4>Exercice: Polynomes ne forment PAS un Banach</h4>
-            <p>Soit P_n = sum_{k=0}^n x^k/k!. C'est une suite de Cauchy qui converge vers e^x, qui n'est pas un polynome!</p>
-        </div>
+    <div class="card-explain">
+      <h3>Normes Classiques sur ℝⁿ</h3>
+      <p>Pour x = (x₁, x₂, ..., xₙ) ∈ ℝⁿ, les normes les plus utilisées sont :</p>
+      <div class="formula">‖x‖₁ = |x₁| + |x₂| + ... + |xₙ|</div>
+      <p>Norme de la somme absolue, donne un losange en dimension 2.</p>
+      <div class="formula">‖x‖₂ = √(x₁² + x₂² + ... + xₙ²)</div>
+      <p>Norme euclidienne, donne un disque parfait.</p>
+      <div class="formula">‖x‖∞ = max(|x₁|, |x₂|, ..., |xₙ|)</div>
+      <p>Norme du sup, donne un carré en dimension 2.</p>
+      <div class="formula">‖x‖ₚ = (|x₁|ᵖ + ... + |xₙ|ᵖ)^(1/p)</div>
+      <p>Glissez le curseur pour voir la boule évoluer continûment de ‖·‖₁ vers ‖·‖∞ !</p>
     </div>
+  </div>
+
 </div>
 
-<!-- ==================== CHAPITRE 2: DIFFERENTIELLE ==================== -->
-<div class="chapter" id="chap1">
-    
-    <div class="card">
-        <h2>Chapitre 2: Differentielle d'une Application</h2>
-        
-        <h3>I. Definition</h3>
-        <p>Soient (E, ||.||_E) et (F, ||.||_F) deux espaces vectoriels normes, U un ouvert de E.</p>
-        <p>On dit que f: U -&gt; F est <strong>differentiable</strong> en x de U s'il existe L in L_c(E,F) telle que:</p>
-        
-        <div class="formula-box">
-            lim_{||h||-&gt;0} ||f(x+h) - f(x) - L(h)||_F / ||h||_E = 0
-        </div>
-        
-        <div class="formula-box">
-            f(x+h) = f(x) + L(h) + o(||h||)  quand ||h|| -&gt; 0
-        </div>
-        
-        <div class="canvas-container">
-            <h4>Visualisation: Approximation par la tangente</h4>
-            <canvas id="diffCanvas" width="700" height="450"></canvas>
-            <div class="controls">
-                <label>h (deplacement): <input type="range" id="hSlider" min="1" max="100" value="50" oninput="updateDiff()"></label>
-                <button onclick="animateDiff()">Animation</button>
-            </div>
-        </div>
-        
-        <div class="info-box">
-            <h4>Interpretation geometrique</h4>
-            <p>La differentielle df(x) est l'application lineaire qui approxime le mieux f au voisinage de x.</p>
-            <p>C'est la generalisation de la notion de derivee aux espaces de dimension infinie.</p>
-        </div>
+<!-- ============================================================ -->
+<!-- SECTION II — NORMES ÉQUIVALENTES -->
+<!-- ============================================================ -->
+<div class="section" id="s2">
+  <div class="section-header">
+    <span class="section-num">II</span>
+    <span class="section-title">Normes Équivalentes</span>
+  </div>
+
+  <div class="def-box">
+    <strong>Définition.</strong> Deux normes N₁ et N₂ sur E sont dites <em>équivalentes</em> s'il existe
+    α, β &gt; 0 tels que : α·N₁(x) ≤ N₂(x) ≤ β·N₁(x) pour tout x ∈ E.
+  </div>
+
+  <div class="card">
+    <div class="card-viz">
+      <canvas id="c-equiv" width="380" height="300"></canvas>
+      <div class="viz-label">Sandwichage entre deux normes</div>
+      <div class="controls">
+        <label>α =</label>
+        <input type="range" id="equiv-a" min="0.2" max="0.9" step="0.05" value="0.5">
+        <label>β =</label>
+        <input type="range" id="equiv-b" min="1.1" max="3" step="0.1" value="1.8">
+      </div>
     </div>
-    
-    <div class="card">
-        <h3>II. Proprietes fondamentales</h3>
-        
-        <div class="formula">
-            1. Unicite: Si f est differentiable, df(x) est unique<br>
-            2. Continuite: f differentiable =&gt; f continue<br>
-            3. Linearite: df(x) in L_c(E,F)
-        </div>
-        
-        <h3>III. Exemples</h3>
-        
-        <div class="example-box">
-            <h4>Exemple 1: Application lineaire</h4>
-            <p>Si L: E -&gt; F est lineaire et continue, alors L est differentiable en tout point et:</p>
-            <div class="formula-box">d_x L(h) = L(h)</div>
-        </div>
-        
-        <div class="example-box">
-            <h4>Exemple 2: Application bilineaire</h4>
-            <p>f(x,y) = xy sur R^2. On montre que:</p>
-            <div class="formula-box">d_{(x,y)} f(h,k) = x*k + y*h</div>
-        </div>
-        
-        <div class="example-box">
-            <h4>Exemple 3: Application constante</h4>
-            <p>Si f est constante, alors f est differentiable et:</p>
-            <div class="formula-box">df(h) = 0</div>
-        </div>
-        
-        <div class="canvas-container">
-            <h4>Visualisation: Differentielle de f(x,y) = xy</h4>
-            <canvas id="bilinearCanvas" width="600" height="400"></canvas>
-            <div class="controls">
-                <label>x: <input type="range" id="bx" min="-3" max="3" step="0.1" value="1" oninput="updateBilinear()"></label>
-                <label>y: <input type="range" id="by" min="-3" max="3" step="0.1" value="2" oninput="updateBilinear()"></label>
-                <button onclick="animateBilinear()">Animation</button>
-            </div>
-        </div>
+    <div class="card-explain">
+      <h3>Équivalence de Normes</h3>
+      <p>Deux normes sont équivalentes si leurs boules unitaires sont "emboîtées" : l'une peut être sandwichée entre deux homothétiques de l'autre.</p>
+      <div class="formula">α · N₁(x) ≤ N₂(x) ≤ β · N₁(x)</div>
+      <p>Géométriquement : la boule unité de N₂ (bleue) est contenue dans la boule de rayon β pour N₁ (rouge grand) et contient la boule de rayon α pour N₁ (rouge petit).</p>
+      <div class="thm-box">
+        <strong>Théorème.</strong> En dimension finie, toutes les normes sont équivalentes.
+        Ce résultat remarquable est faux en dimension infinie !
+      </div>
+      <p>Sur ℝⁿ, on a toujours : ‖x‖∞ ≤ ‖x‖₂ ≤ ‖x‖₁ ≤ √n · ‖x‖₂ ≤ n · ‖x‖∞</p>
     </div>
+  </div>
 </div>
 
-<!-- ==================== CHAPITRE 3: DERIVEES DIRECTIONNELLES ==================== -->
-<div class="chapter" id="chap2">
-    
-    <div class="card">
-        <h2>Chapitre 3: Derivees Directionnelles</h2>
-        
-        <h3>I. Definition</h3>
-        <p>Soient E et F deux e.v.n, U un ouvert de E et v un vecteur non nul de E.</p>
-        <p>On dit que f: U -&gt; F admet au point x de U une <strong>derivee dans la direction de v</strong> si:</p>
-        
-        <div class="formula-box">
-            phi_v(t) = f(x + tv) est derivable en t = 0
-        </div>
-        
-        <div class="formula-box">
-            D_v f(x) = lim_{t-&gt;0} [f(x+tv) - f(x)] / t = phi'_v(0)
-        </div>
-        
-        <div class="canvas-container">
-            <h4>Visualisation interactive: Derivees directionnelles</h4>
-            <canvas id="dirCanvas" width="700" height="500"></canvas>
-            <div class="controls">
-                <label>Direction theta: <input type="range" id="thetaSlider" min="0" max="360" value="45" oninput="updateDir()"></label>
-                <button onclick="startDirAnimation()">Tourner la direction</button>
-                <button onclick="addDirection()">Ajouter direction</button>
-            </div>
-        </div>
-    </div>
-    
-    <div class="card">
-        <h3>II. Lien avec la differentielle</h3>
-        
-        <div class="info-box">
-            <h4>Proposition fondamentale</h4>
-            <p>Si f est differentiable au sens de Frechet en x, alors pour tout v != 0:</p>
-            <div class="formula-box">D_v f(x) = d_x f(v)</div>
-        </div>
-        
-        <div class="canvas-container">
-            <h4>Surface z = x^2 + y^2 avec directions</h4>
-            <canvas id="surfaceDirCanvas" width="600" height="400"></canvas>
-            <div class="controls">
-                <button onclick="drawSurfaceDir(0)">Direction x (1,0)</button>
-                <button onclick="drawSurfaceDir(1)">Direction y (0,1)</button>
-                <button onclick="drawSurfaceDir(2)">Diagonale (1,1)</button>
-                <button onclick="drawSurfaceDir(3)">Direction gradient</button>
-            </div>
-        </div>
-        
-        <div class="example-box">
-            <h4>Exemple numerique</h4>
-            <p>f(x,y) = x^2 + y^2 au point (1,1):</p>
-            <ul>
-                <li>Gradient: nabla f = (2x, 2y) = (2, 2)</li>
-                <li>D_{(1,0)} f = nabla f . (1,0) = 2</li>
-                <li>D_{(0,1)} f = nabla f . (0,1) = 2</li>
-                <li>D_{(1,1)/sqrt(2)} f = nabla f . v = 2*0.707 + 2*0.707 = 2.83 (MAXIMUM)</li>
-            </ul>
-            <p><strong>La direction du gradient donne la croissance maximale!</strong></p>
-        </div>
-    </div>
-</div>
-'''
+<!-- ============================================================ -->
+<!-- SECTION III — BOULES OUVERTES / FERMÉES -->
+<!-- ============================================================ -->
+<div class="section" id="s3">
+  <div class="section-header">
+    <span class="section-num">III</span>
+    <span class="section-title">Boules Ouvertes et Fermées</span>
+  </div>
 
-with open('/mnt/agents/output/analyse_part2.html', 'w', encoding='utf-8') as f:
-    f.write(part2)
-
-print("Part 2 written successfully")
-print(f"Length: {len(part2)} characters")
-
-part3 = '''
-<!-- ==================== CHAPITRE 4: NORME OPERATEUR ==================== -->
-<div class="chapter" id="chap3">
-    
-    <div class="card">
-        <h2>Chapitre 4: Norme d'Operateur</h2>
-        
-        <h3>I. Definition</h3>
-        <p>Soient (E, ||.||_E) et (F, ||.||_F) deux espaces vectoriels normes.</p>
-        <p>On note L_c(E,F) l'ensemble des applications lineaires continues de E dans F.</p>
-        
-        <div class="formula-box">
-            ||u||_{L_c(E,F)} = sup_{||x||_E &lt;= 1} ||u(x)||_F
-        </div>
-        
-        <div class="canvas-container">
-            <h4>Visualisation: Sphere unite -&gt; Ellipsoide</h4>
-            <canvas id="operatorCanvas" width="700" height="400"></canvas>
-            <div class="controls">
-                <label>Facteur x: <input type="range" id="opX" min="0.5" max="3" step="0.1" value="2" oninput="updateOperator()"></label>
-                <label>Facteur y: <input type="range" id="opY" min="0.5" max="3" step="0.1" value="1" oninput="updateOperator()"></label>
-                <button onclick="animateOperator()">Animation</button>
-            </div>
-        </div>
+  <div class="card">
+    <div class="card-viz">
+      <canvas id="c-balls" width="380" height="320"></canvas>
+      <div class="viz-label">Boules ouvertes et fermées (cliquer pour placer un point)</div>
+      <div class="controls">
+        <label>Centre a =</label>
+        <input type="range" id="ball-cx" min="-1.5" max="1.5" step="0.1" value="0.3">
+        <label>Rayon r =</label>
+        <input type="range" id="ball-r" min="0.2" max="1.8" step="0.05" value="0.8">
+        <select id="ball-norm">
+          <option value="2">‖·‖₂</option>
+          <option value="1">‖·‖₁</option>
+          <option value="inf">‖·‖∞</option>
+        </select>
+      </div>
     </div>
-    
-    <div class="card">
-        <h3>II. Definitions equivalentes</h3>
-        
-        <div class="formula">
-            ||u|| = sup_{||x|| &lt;= 1} ||u(x)||  (boule unite fermee)<br>
-            ||u|| = sup_{||x|| = 1} ||u(x)||  (sphere unite)<br>
-            ||u|| = sup_{x != 0} ||u(x)|| / ||x||  (rapport de croissance)
-        </div>
-        
-        <div class="info-box">
-            <h4>Interpretation</h4>
-            <p>La norme d'operateur mesure le "facteur d'etirement" maximal de u.</p>
-            <p>C'est le plus grand coefficient k tel que: ||u(x)|| &lt;= k * ||x||</p>
-        </div>
-        
-        <div class="example-box">
-            <h4>Exercice resolu</h4>
-            <p>E = C^0([0,1], R) avec ||f||_inf = sup |f(t)|</p>
-            <p>u: f -&gt; f(0). Calculer ||u||.</p>
-            <p>Solution: ||u|| = sup |f(0)|/||f||_inf &lt;= 1. Avec f_0(t) = 1, on a |f_0(0)|/||f_0|| = 1.</p>
-            <p>Donc <strong>||u|| = 1</strong>.</p>
-        </div>
-        
-        <div class="canvas-container">
-            <h4>Visualisation: Norme d'operateur en action</h4>
-            <canvas id="normOpCanvas" width="600" height="400"></canvas>
-            <div class="controls">
-                <button onclick="showNormDef(1)">Sur boule unite</button>
-                <button onclick="showNormDef(2)">Sur sphere unite</button>
-                <button onclick="showNormDef(3)">Rapport ||u(x)||/||x||</button>
-            </div>
-        </div>
+    <div class="card-explain">
+      <h3>Boules dans un Espace Normé</h3>
+      <p>Dans (E, ‖·‖), on définit deux types de boules centrées en a ∈ E de rayon r &gt; 0 :</p>
+      <div class="formula">B(a, r) = {x ∈ E : ‖x − a‖ &lt; r}  (ouverte)</div>
+      <div class="formula">B̄(a, r) = {x ∈ E : ‖x − a‖ ≤ r}  (fermée)</div>
+      <p>La <strong>sphère</strong> de centre a et rayon r est :</p>
+      <div class="formula">S(a, r) = {x ∈ E : ‖x − a‖ = r}</div>
+      <ul>
+        <li>La boule ouverte <strong>exclut</strong> la sphère frontière</li>
+        <li>La boule fermée <strong>inclut</strong> la sphère frontière</li>
+        <li>La forme dépend de la norme choisie !</li>
+        <li>Toute boule ouverte est un ouvert ; toute boule fermée est un fermé</li>
+      </ul>
     </div>
-    
-    <div class="card">
-        <h3>III. Propriete fondamentale</h3>
-        
-        <div class="info-box">
-            <h4>Theoreme</h4>
-            <p>Si (F, ||.||_F) est un espace de Banach, alors L_c(E,F) muni de la norme operateur est aussi un espace de Banach.</p>
-        </div>
-        
-        <div class="formula">
-            Preuve en 4 etapes:<br>
-            1. Convergence simple: u_n(x) -&gt; u(x)<br>
-            2. u est lineaire<br>
-            3. u est continue (bornee)<br>
-            4. u_n -&gt; u dans L_c(E,F)
-        </div>
-    </div>
+  </div>
 </div>
 
-<!-- ==================== CHAPITRE 5: FONCTIONS IMPLICITES ==================== -->
-<div class="chapter" id="chap4">
-    
-    <div class="card">
-        <h2>Chapitre 5: Theoreme des Fonctions Implicites</h2>
-        
-        <h3>I. Enonce</h3>
-        <p>Soit U (resp. V) un ouvert de R^p (resp. R^m) et f: U x V -&gt; R^m de classe C^1.</p>
-        <p>Soit (a,b) in U x V tel que f(a,b) = 0.</p>
-        
-        <div class="info-box">
-            <h4>Condition cle</h4>
-            <p>Si la matrice jacobienne D(f_1,...,f_m)/D(x_{p+1},...,x_{p+m}) (a,b) est <strong>inversible</strong>, alors:</p>
-        </div>
-        
-        <div class="formula-box">
-            Il existe un voisinage U_a de a et phi: U_a -&gt; V de classe C^1 telle que:<br>
-            f(x, phi(x)) = 0  pour tout x dans U_a
-        </div>
-        
-        <div class="canvas-container">
-            <h4>Visualisation: Courbe implicite f(x,y) = 0</h4>
-            <canvas id="implicitCanvas" width="600" height="500"></canvas>
-            <div class="controls">
-                <label>Point x: <input type="range" id="impX" min="-2" max="2" step="0.1" value="-1" oninput="updateImplicit()"></label>
-                <label>Point y: <input type="range" id="impY" min="-2" max="2" step="0.1" value="1" oninput="updateImplicit()"></label>
-                <button onclick="animateImplicit()">Animation</button>
-            </div>
-        </div>
+<!-- ============================================================ -->
+<!-- SECTION IV — SUITES DE CAUCHY -->
+<!-- ============================================================ -->
+<div class="section" id="s4">
+  <div class="section-header">
+    <span class="section-num">IV</span>
+    <span class="section-title">Suites de Cauchy</span>
+  </div>
+
+  <div class="def-box">
+    <strong>Définition.</strong> Une suite (xₙ) dans (E, ‖·‖) est de Cauchy si :
+    ∀ε &gt; 0, ∃N ∈ ℕ tel que ∀p,q ≥ N : ‖xₚ − xq‖ &lt; ε.
+  </div>
+
+  <div class="card">
+    <div class="card-viz">
+      <canvas id="c-cauchy" width="380" height="300"></canvas>
+      <div class="viz-label">Suite de Cauchy qui converge vs suite qui ne converge pas</div>
+      <div class="controls">
+        <label>ε =</label>
+        <input type="range" id="cau-eps" min="0.05" max="0.8" step="0.01" value="0.3">
+        <select id="cau-type">
+          <option value="conv">Convergente (Banach)</option>
+          <option value="miss">Cauchy sans limite (non-complet)</option>
+        </select>
+        <button onclick="animCauchy()">▶ Animer</button>
+      </div>
     </div>
-    
-    <div class="card">
-        <h3>II. Formule de derivation</h3>
-        
-        <div class="formula-box">
-            dphi/dx = - [D(f)/D(y)]^{-1} * [D(f)/D(x)]
-        </div>
-        
-        <div class="example-box">
-            <h4>Exercice 1 resolu</h4>
-            <p>f(x,y) = x^4 + x^3*y^2 - y + y^2 + y^3 - 1 = 0 au voisinage de (-1, 1)</p>
-            <p>Verification: f(-1,1) = 1 - 1 - 1 + 1 + 1 - 1 = 0</p>
-            <p>df/dy(-1,1) = -2 - 1 + 2 + 3 = 2 != 0</p>
-            <p>df/dx(-1,1) = -4 + 3 = -1</p>
-            <p>Donc: dy/dx(-1,1) = -(-1)/2 = <strong>1/2</strong></p>
-        </div>
-        
-        <div class="example-box">
-            <h4>Exercice 2 resolu</h4>
-            <p>f(x,y,z) = x + y + z + sin(xyz) = 0 au voisinage de (0,0,0)</p>
-            <p>df/dz(0,0,0) = 1 != 0</p>
-            <p>dz/dx(0,0,0) = -1, dz/dy(0,0,0) = -1</p>
-        </div>
+    <div class="card-explain">
+      <h3>Suites de Cauchy et Convergence</h3>
+      <p>Une suite de Cauchy est une suite dont les termes se <em>resserrent</em> mutuellement, sans nécessairement converger vers un point de l'espace !</p>
+      <div class="thm-box">
+        <strong>Théorème.</strong> Toute suite convergente est de Cauchy.
+        La réciproque est vraie si et seulement si l'espace est <em>complet</em>.
+      </div>
+      <p><strong>Exemple clé :</strong> Dans ℚ (rationnels), la suite 3, 3.1, 3.14, 3.141, 3.1415, ... est de Cauchy mais sa limite π ∉ ℚ. L'espace ℚ n'est pas complet !</p>
+      <div class="formula">‖xₚ − xq‖ &lt; ε  pour tous p, q ≥ N(ε)</div>
+      <p>Plus N est grand, plus ε peut être petit : les termes deviennent arbitrairement proches entre eux.</p>
     </div>
+  </div>
 </div>
 
-<!-- ==================== EXERCICES INTERACTIFS ==================== -->
-<div class="chapter" id="chap5">
-    
-    <div class="card">
-        <h2>Exercices Interactifs</h2>
-        
-        <div class="exercise">
-            <h3>Exercice 1: Normes</h3>
-            <p>Soit x = (3, -4). Calculer ||x||_1, ||x||_2 et ||x||_inf.</p>
-            <p>||x||_1 = <input type="number" id="ex1_1" placeholder="?"> (somme des valeurs absolues)</p>
-            <p>||x||_2 = <input type="number" id="ex1_2" placeholder="?"> (racine carree de la somme des carres)</p>
-            <p>||x||_inf = <input type="number" id="ex1_inf" placeholder="?"> (maximum des valeurs absolues)</p>
-            <button onclick="checkEx1()">Verifier</button>
-            <div id="ex1_result" class="result"></div>
-        </div>
-        
-        <div class="exercise">
-            <h3>Exercice 2: Differentielle</h3>
-            <p>Soit f(x,y) = x^2 * y. Quelle est la differentielle d_{(1,2)} f(h,k) ?</p>
-            <p>d_{(1,2)} f(h,k) = <input type="text" id="ex2" placeholder="ex: 4h + k" style="width: 200px;"></p>
-            <button onclick="checkEx2()">Verifier</button>
-            <div id="ex2_result" class="result"></div>
-        </div>
-        
-        <div class="exercise">
-            <h3>Exercice 3: Derivee directionnelle</h3>
-            <p>f(x,y) = x^2 + y^2 au point (1,1). Quelle est D_v f(1,1) pour v = (1,1)/sqrt(2) ?</p>
-            <p>Reponse: <input type="number" id="ex3" placeholder="?" step="0.01"></p>
-            <button onclick="checkEx3()">Verifier</button>
-            <div id="ex3_result" class="result"></div>
-        </div>
-        
-        <div class="exercise">
-            <h3>Exercice 4: Fonction implicite</h3>
-            <p>x^2 + y^2 = 1 au point (0,1). Calculer dy/dx.</p>
-            <p>dy/dx = <input type="number" id="ex4" placeholder="?" step="0.01"></p>
-            <button onclick="checkEx4()">Verifier</button>
-            <div id="ex4_result" class="result"></div>
-        </div>
+<!-- ============================================================ -->
+<!-- SECTION V — COMPLÉTUDE & ESPACES DE BANACH -->
+<!-- ============================================================ -->
+<div class="section" id="s5">
+  <div class="section-header">
+    <span class="section-num">V</span>
+    <span class="section-title">Complétude — Espaces de Banach</span>
+  </div>
+
+  <div class="def-box">
+    <strong>Définition fondamentale.</strong> Un espace vectoriel normé (E, ‖·‖) est un
+    <em>espace de Banach</em> si toute suite de Cauchy dans E converge vers un élément de E.
+    (E est <em>complet</em> pour la distance induite par la norme.)
+  </div>
+
+  <div class="card">
+    <div class="card-viz">
+      <canvas id="c-complete" width="380" height="320"></canvas>
+      <div class="viz-label">Espace complet vs non-complet</div>
+      <div class="controls">
+        <button onclick="toggleComplete()">Basculer complet/non-complet</button>
+      </div>
+      <div id="complete-label" style="margin-top:0.5rem;font-family:monospace;font-size:0.85rem;color:var(--accent2)">Mode : Espace complet (Banach)</div>
     </div>
-    
-    <div class="card">
-        <h2>Simulateur de Normes</h2>
-        <div class="canvas-container">
-            <h4>Entrez un vecteur et voyez ses normes</h4>
-            <canvas id="simCanvas" width="500" height="400"></canvas>
-            <div class="controls">
-                <label>x: <input type="number" id="simX" value="3" oninput="updateSim()"></label>
-                <label>y: <input type="number" id="simY" value="4" oninput="updateSim()"></label>
-            </div>
-            <div id="simResults" style="margin-top: 15px; font-size: 1.2em;"></div>
-        </div>
+    <div class="card-explain">
+      <h3>Espaces de Banach</h3>
+      <p>La complétude est la propriété qui garantit qu'aucune suite "convergente en esprit" ne peut s'échapper de l'espace.</p>
+      <div class="ex-box">
+        <strong>Exemples d'espaces de Banach :</strong><br>
+        • (ℝⁿ, ‖·‖ₚ) pour tout p ≥ 1<br>
+        • C([a,b]) avec ‖f‖∞ = sup|f(t)|<br>
+        • ℓᵖ(ℕ) = {(xₙ) : Σ|xₙ|ᵖ &lt; ∞}<br>
+        • L²(Ω) (espace de Hilbert)
+      </div>
+      <div class="ex-box">
+        <strong>Contre-exemples (non de Banach) :</strong><br>
+        • (ℚ, |·|) — rationnels avec valeur absolue<br>
+        • C([0,1]) avec ‖f‖₁ = ∫₀¹|f(t)|dt<br>
+        • Polynômes P([0,1]) avec ‖·‖∞
+      </div>
+      <div class="thm-box">
+        <strong>Théorème.</strong> (ℝⁿ, ‖·‖) est un espace de Banach pour toute norme ‖·‖.
+      </div>
     </div>
+  </div>
+
+  <!-- Completion card -->
+  <div class="card">
+    <div class="card-viz">
+      <canvas id="c-completion" width="380" height="280"></canvas>
+      <div class="viz-label">Complété d'un espace : ajouter les points manquants</div>
+    </div>
+    <div class="card-explain">
+      <h3>Complété d'un Espace Normé</h3>
+      <p>Tout espace normé (E, ‖·‖) peut être "complété" : on peut construire un espace de Banach Ê qui contient E comme sous-espace dense.</p>
+      <div class="formula">E  ⊂dense  Ê  (Ê est de Banach)</div>
+      <p>Construction : les éléments de Ê sont des classes d'équivalence de suites de Cauchy de E.</p>
+      <ul>
+        <li>ℚ se complète en ℝ</li>
+        <li>Les polynômes P([0,1]) se complètent en C([0,1])</li>
+        <li>C([0,1]) avec ‖·‖₂ se complète en L²([0,1])</li>
+      </ul>
+      <div class="thm-box">
+        <strong>Unicité :</strong> Le complété est unique à isomorphisme isométrique près.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SECTION VI — TOPOLOGIE -->
+<!-- ============================================================ -->
+<div class="section" id="s6">
+  <div class="section-header">
+    <span class="section-num">VI</span>
+    <span class="section-title">Topologie des Espaces Normés</span>
+  </div>
+
+  <div class="def-box">
+    <strong>Introduction.</strong> La norme induit une topologie sur E via la distance d(x,y) = ‖x − y‖.
+    On peut alors parler d'ouverts, fermés, compacts, connexes...
+  </div>
+
+  <div class="card">
+    <div class="card-viz">
+      <canvas id="c-open-closed" width="380" height="300"></canvas>
+      <div class="viz-label">Ouverts et fermés — cliquer pour tester un point</div>
+      <div class="controls">
+        <select id="topo-type">
+          <option value="open">Ensemble ouvert</option>
+          <option value="closed">Ensemble fermé</option>
+          <option value="neither">Ni ouvert ni fermé</option>
+          <option value="both">Ouvert ET fermé (clopen)</option>
+        </select>
+      </div>
+    </div>
+    <div class="card-explain">
+      <h3>Ouverts et Fermés</h3>
+      <p>Un ensemble U ⊂ E est <strong>ouvert</strong> si tout point de U est un point intérieur :</p>
+      <div class="formula">∀x ∈ U, ∃r &gt; 0 : B(x,r) ⊂ U</div>
+      <p>Un ensemble F ⊂ E est <strong>fermé</strong> s'il contient toutes ses limites :</p>
+      <div class="formula">F fermé ⟺ E \ F ouvert</div>
+      <ul>
+        <li>∅ et E sont à la fois ouverts et fermés</li>
+        <li>Union quelconque d'ouverts est ouverte</li>
+        <li>Intersection finie d'ouverts est ouverte</li>
+        <li>Intersection quelconque de fermés est fermée</li>
+        <li>Union finie de fermés est fermée</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-viz">
+      <canvas id="c-dense" width="380" height="280"></canvas>
+      <div class="viz-label">Dense, intérieur, adhérence</div>
+    </div>
+    <div class="card-explain">
+      <h3>Intérieur, Adhérence, Dense</h3>
+      <p>Pour A ⊂ E, on définit :</p>
+      <div class="formula">Int(A) = plus grand ouvert ⊂ A</div>
+      <div class="formula">Ā = plus petit fermé ⊃ A</div>
+      <div class="formula">∂A = Ā \ Int(A)  (frontière)</div>
+      <p>A est <strong>dense</strong> dans E si Ā = E, c'est-à-dire si tout ouvert non vide de E rencontre A.</p>
+      <ul>
+        <li>ℚ est dense dans ℝ</li>
+        <li>Les polynômes sont denses dans C([0,1]) (Weierstrass)</li>
+        <li>Int(B̄(a,r)) = B(a,r) dans un espace normé</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SECTION VII — APPLICATIONS CONTINUES / LINÉAIRES -->
+<!-- ============================================================ -->
+<div class="section" id="s7">
+  <div class="section-header">
+    <span class="section-num">VII</span>
+    <span class="section-title">Applications Linéaires Continues</span>
+  </div>
+
+  <div class="def-box">
+    <strong>Définition.</strong> Soit f : (E, ‖·‖_E) → (F, ‖·‖_F) linéaire. f est <em>continue</em>
+    si et seulement si elle est <em>bornée</em> : ∃M &gt; 0, ‖f(x)‖_F ≤ M · ‖x‖_E pour tout x ∈ E.
+  </div>
+
+  <div class="card">
+    <div class="card-viz">
+      <canvas id="c-linear-map" width="380" height="300"></canvas>
+      <div class="viz-label">Application linéaire continue : image de la boule unité</div>
+      <div class="controls">
+        <label>a =</label>
+        <input type="range" id="lm-a" min="-2" max="2" step="0.1" value="1.2">
+        <label>b =</label>
+        <input type="range" id="lm-b" min="-2" max="2" step="0.1" value="0.5">
+        <label>c =</label>
+        <input type="range" id="lm-c" min="-2" max="2" step="0.1" value="0.3">
+        <label>d =</label>
+        <input type="range" id="lm-d" min="-2" max="2" step="0.1" value="1.5">
+      </div>
+    </div>
+    <div class="card-explain">
+      <h3>Norme d'Opérateur</h3>
+      <p>Pour T : E → F linéaire continue, on définit la <strong>norme d'opérateur</strong> :</p>
+      <div class="formula">‖T‖ = sup{‖T(x)‖_F : ‖x‖_E ≤ 1}</div>
+      <div class="formula">‖T‖ = sup{‖T(x)‖_F / ‖x‖_E : x ≠ 0}</div>
+      <p>C'est le plus petit M tel que ‖T(x)‖ ≤ M·‖x‖ pour tout x.</p>
+      <div class="thm-box">
+        <strong>Théorème.</strong> L(E, F) = {applications linéaires continues E → F}
+        est un espace de Banach pour la norme d'opérateur, si F est de Banach.
+      </div>
+      <p>L'image de la boule unité de E par T est un ellipsoïde (en dim. finie).</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SECTION VIII — EXEMPLES CLASSIQUES -->
+<!-- ============================================================ -->
+<div class="section" id="s8">
+  <div class="section-header">
+    <span class="section-num">VIII</span>
+    <span class="section-title">Exemples Classiques d'Espaces de Banach</span>
+  </div>
+
+  <div class="card">
+    <div class="card-viz">
+      <canvas id="c-lp" width="380" height="300"></canvas>
+      <div class="viz-label">Espace ℓᵖ : suites sommables</div>
+      <div class="controls">
+        <select id="lp-p">
+          <option value="1">ℓ¹</option>
+          <option value="2" selected>ℓ²</option>
+          <option value="inf">ℓ∞</option>
+        </select>
+        <button onclick="newLpSequence()">Nouvelle suite</button>
+      </div>
+    </div>
+    <div class="card-explain">
+      <h3>Espaces ℓᵖ(ℕ)</h3>
+      <p>Les espaces de suites à puissance p-ième sommable :</p>
+      <div class="formula">ℓᵖ = {(xₙ)ₙ≥₀ ⊂ ℝ : Σₙ |xₙ|ᵖ &lt; ∞}</div>
+      <div class="formula">‖x‖_ℓᵖ = (Σₙ |xₙ|ᵖ)^(1/p)</div>
+      <p>Pour p = ∞ :</p>
+      <div class="formula">ℓ∞ = {(xₙ) bornée},  ‖x‖_ℓ∞ = sup_n |xₙ|</div>
+      <ul>
+        <li>ℓ¹ ⊂ ℓ² ⊂ ℓ∞ (inclusions strictes)</li>
+        <li>Chacun est un espace de Banach</li>
+        <li>ℓ² est un espace de Hilbert (produit scalaire)</li>
+        <li>Ces espaces sont séparables pour p &lt; ∞</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-viz">
+      <canvas id="c-cfunc" width="380" height="280"></canvas>
+      <div class="viz-label">C([a,b]) avec ‖f‖∞ = sup|f|</div>
+      <div class="controls">
+        <button onclick="newCFunc()">Nouvelle fonction</button>
+        <label>n fonctions :</label>
+        <input type="range" id="cf-n" min="1" max="8" step="1" value="3">
+      </div>
+    </div>
+    <div class="card-explain">
+      <h3>Espace C([a,b])</h3>
+      <p>L'espace des fonctions continues sur [a,b] muni de la norme du supremum :</p>
+      <div class="formula">‖f‖∞ = max_{t ∈ [a,b]} |f(t)|</div>
+      <p>C'est un espace de Banach fondamental en analyse. La convergence pour ‖·‖∞ est exactement la <strong>convergence uniforme</strong>.</p>
+      <div class="thm-box">
+        <strong>Théorème de Weierstrass.</strong> Les polynômes sont denses dans C([a,b]).
+        Toute fonction continue peut être approchée uniformément par des polynômes.
+      </div>
+      <div class="ex-box">
+        <strong>Attention !</strong> C([0,1]) avec ‖f‖₁ = ∫₀¹|f| n'est PAS de Banach.
+        Son complété est L¹([0,1]).
+      </div>
+    </div>
+  </div>
+
 </div>
 
 </main>
 
-<footer>
-    <p>Analyse Fonctionnelle - Cours Interactif | Cree avec HTML5 Canvas & JavaScript</p>
-</footer>
+<footer>Cours Analyse Fonctionnelle — Espaces de Banach · Construit avec HTML/CSS/JS interactif</footer>
 
 <script>
-// ==================== NAVIGATION ====================
-function showChapter(n) {
-    document.querySelectorAll('.chapter').forEach(c => c.classList.remove('active'));
-    document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
-    document.getElementById('chap' + n).classList.add('active');
-    document.getElementById('btn' + n).classList.add('active');
-    setTimeout(() => {
-        if (n === 0) { drawNorm(2); drawBall(); }
-        if (n === 1) { updateDiff(); updateBilinear(); }
-        if (n === 2) { updateDir(); drawSurfaceDir(0); }
-        if (n === 3) { updateOperator(); showNormDef(1); }
-        if (n === 4) { updateImplicit(); }
-        if (n === 5) { updateSim(); }
-    }, 100);
-}
+// ============================================================
+// UTILITIES
+// ============================================================
+function lerp(a,b,t){return a+(b-a)*t;}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
 
-// ==================== CHAP 1: NORMES ====================
-let currentNorm = 2;
-
-function drawNorm(p) {
-    currentNorm = p;
-    const canvas = document.getElementById('normCanvas');
-    const ctx = canvas.getContext('2d');
-    const cx = canvas.width / 2, cy = canvas.height / 2;
-    const scale = 100;
-    
-    ctx.fillStyle = '#1a1a2e';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-    ctx.strokeStyle = 'rgba(255,255,255,0.1)';
-    ctx.lineWidth = 1;
-    for (let i = -3; i <= 3; i++) {
-        ctx.beginPath(); ctx.moveTo(cx + i*scale, 0); ctx.lineTo(cx + i*scale, canvas.height); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(0, cy + i*scale); ctx.lineTo(canvas.width, cy + i*scale); ctx.stroke();
-    }
-    
-    ctx.strokeStyle = '#e94560';
-    ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.moveTo(cx, 0); ctx.lineTo(cx, canvas.height); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(0, cy); ctx.lineTo(canvas.width, cy); ctx.stroke();
-    
-    ctx.strokeStyle = '#667eea';
-    ctx.lineWidth = 3;
-    ctx.fillStyle = 'rgba(102, 126, 234, 0.2)';
-    ctx.beginPath();
-    
-    if (p === 1) {
-        ctx.moveTo(cx, cy - scale);
-        ctx.lineTo(cx + scale, cy);
-        ctx.lineTo(cx, cy + scale);
-        ctx.lineTo(cx - scale, cy);
-        ctx.closePath();
-    } else if (p === 2) {
-        ctx.arc(cx, cy, scale, 0, 2 * Math.PI);
-    } else if (p === 'inf') {
-        ctx.rect(cx - scale, cy - scale, 2*scale, 2*scale);
-    }
-    
-    ctx.fill(); ctx.stroke();
-    
-    ctx.fillStyle = '#fff';
-    ctx.font = 'bold 18px Arial';
-    let label = p === 1 ? '||.||_1 (Losange)' : p === 2 ? '||.||_2 (Cercle)' : '||.||_inf (Carre)';
-    ctx.fillText(label, 20, 40);
-    
-    let vx = 2, vy = 1;
-    ctx.strokeStyle = '#e94560';
-    ctx.lineWidth = 3;
-    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + vx*scale, cy - vy*scale); ctx.stroke();
-    ctx.fillStyle = '#e94560';
-    ctx.beginPath(); ctx.arc(cx + vx*scale, cy - vy*scale, 5, 0, 2*Math.PI); ctx.fill();
-    
-    let n1 = Math.abs(vx) + Math.abs(vy);
-    let n2 = Math.sqrt(vx*vx + vy*vy).toFixed(3);
-    let ninf = Math.max(Math.abs(vx), Math.abs(vy));
-    
-    ctx.font = '14px Arial';
-    ctx.fillStyle = '#ffc107';
-    ctx.fillText('Pour v = (2,1):', 20, 70);
-    ctx.fillText('||v||_1 = ' + n1, 20, 95);
-    ctx.fillText('||v||_2 = ' + n2, 20, 115);
-    ctx.fillText('||v||_inf = ' + ninf, 20, 135);
-}
-
-function animateNorms() {
-    let p = 1, dir = 1;
-    let anim = setInterval(() => {
-        p += dir * 0.05;
-        if (p >= 10) dir = -1;
-        if (p <= 1) dir = 1;
-        
-        const canvas = document.getElementById('normCanvas');
-        const ctx = canvas.getContext('2d');
-        const cx = canvas.width / 2, cy = canvas.height / 2;
-        const scale = 100;
-        
-        ctx.fillStyle = '#1a1a2e';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
-        ctx.strokeStyle = 'rgba(255,255,255,0.1)';
-        for (let i = -3; i <= 3; i++) {
-            ctx.beginPath(); ctx.moveTo(cx + i*scale, 0); ctx.lineTo(cx + i*scale, canvas.height); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(0, cy + i*scale); ctx.lineTo(canvas.width, cy + i*scale); ctx.stroke();
-        }
-        
-        ctx.strokeStyle = '#e94560';
-        ctx.lineWidth = 2;
-        ctx.beginPath(); ctx.moveTo(cx, 0); ctx.lineTo(cx, canvas.height); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(0, cy); ctx.lineTo(canvas.width, cy); ctx.stroke();
-        
-        ctx.strokeStyle = '#667eea';
-        ctx.fillStyle = 'rgba(102, 126, 234, 0.2)';
-        ctx.lineWidth = 3;
-        ctx.beginPath();
-        
-        for (let theta = 0; theta <= 2*Math.PI; theta += 0.01) {
-            let c = Math.cos(theta), s = Math.sin(theta);
-            let r = 1 / Math.pow(Math.pow(Math.abs(c), p) + Math.pow(Math.abs(s), p), 1/p);
-            if (theta === 0) ctx.moveTo(cx + r*scale*c, cy - r*scale*s);
-            else ctx.lineTo(cx + r*scale*c, cy - r*scale*s);
-        }
-        ctx.closePath();
-        ctx.fill(); ctx.stroke();
-        
-        ctx.fillStyle = '#fff';
-        ctx.font = 'bold 18px Arial';
-        ctx.fillText('p = ' + p.toFixed(2), 20, 40);
-    }, 50);
-    
-    setTimeout(() => clearInterval(anim), 5000);
-}
-
-// ==================== CHAP 1: BOULES ====================
-let ballOpen = true;
-
-function drawBall() {
-    const canvas = document.getElementById('ballCanvas');
-    const ctx = canvas.getContext('2d');
-    const cx = canvas.width / 2, cy = canvas.height / 2;
-    const r = parseInt(document.getElementById('radiusSlider').value);
-    
-    ctx.fillStyle = '#1a1a2e';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-    ctx.strokeStyle = 'rgba(255,255,255,0.1)';
-    for (let i = 0; i < canvas.width; i += 40) {
-        ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, canvas.height); ctx.stroke();
-    }
-    for (let i = 0; i < canvas.height; i += 40) {
-        ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(canvas.width, i); ctx.stroke();
-    }
-    
-    ctx.fillStyle = ballOpen ? 'rgba(102, 126, 234, 0.3)' : 'rgba(233, 69, 96, 0.3)';
-    ctx.strokeStyle = ballOpen ? '#667eea' : '#e94560';
-    ctx.lineWidth = ballOpen ? 2 : 4;
-    ctx.setLineDash(ballOpen ? [5, 5] : []);
-    
-    ctx.beginPath();
-    ctx.arc(cx, cy, r, 0, 2 * Math.PI);
-    ctx.fill(); ctx.stroke();
-    ctx.setLineDash([]);
-    
-    ctx.fillStyle = '#ffc107';
-    ctx.beginPath(); ctx.arc(cx, cy, 6, 0, 2*Math.PI); ctx.fill();
-    
-    ctx.fillStyle = '#fff';
-    ctx.font = 'bold 18px Arial';
-    ctx.fillText(ballOpen ? 'Boule OUVERTE B(x,r)' : 'Boule FERMEE B\'(x,r)', 20, 40);
-    ctx.font = '14px Arial';
-    ctx.fillText('r = ' + r, 20, 65);
-    
-    if (!ballOpen) {
-        ctx.fillStyle = '#e94560';
-        for (let theta = 0; theta < 2*Math.PI; theta += Math.PI/4) {
-            let px = cx + r * Math.cos(theta);
-            let py = cy + r * Math.sin(theta);
-            ctx.beginPath(); ctx.arc(px, py, 4, 0, 2*Math.PI); ctx.fill();
-        }
-    }
-}
-
-function toggleBallType() {
-    ballOpen = !ballOpen;
-    drawBall();
-}
-
-// ==================== CHAP 1: CONVERGENCE ====================
-let convAnim = null;
-
-function startConvergence() {
-    const canvas = document.getElementById('convergenceCanvas');
-    const ctx = canvas.getContext('2d');
-    let n = 0;
-    
-    if (convAnim) clearInterval(convAnim);
-    
-    convAnim = setInterval(() => {
-        n++;
-        ctx.fillStyle = '#1a1a2e';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
-        ctx.strokeStyle = '#667eea';
-        ctx.lineWidth = 2;
-        ctx.beginPath(); ctx.moveTo(30, canvas.height-30); ctx.lineTo(canvas.width-10, canvas.height-30); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(30, canvas.height-30); ctx.lineTo(30, 20); ctx.stroke();
-        
-        ctx.strokeStyle = '#e94560';
-        ctx.setLineDash([5, 5]);
-        ctx.beginPath(); ctx.moveTo(30, 100); ctx.lineTo(canvas.width-10, 100); ctx.stroke();
-        ctx.setLineDash([]);
-        ctx.fillStyle = '#e94560';
-        ctx.fillText('l (limite)', 40, 95);
-        
-        ctx.fillStyle = 'rgba(233, 69, 96, 0.1)';
-        ctx.fillRect(30, 80, canvas.width-40, 40);
-        
-        ctx.fillStyle = '#ffc107';
-        for (let i = 1; i <= Math.min(n, 50); i++) {
-            let x = 30 + i * 12;
-            let y = canvas.height - 30 - (1 + 1/i) * 80;
-            ctx.beginPath(); ctx.arc(x, y, 4, 0, 2*Math.PI); ctx.fill();
-        }
-        
-        ctx.fillStyle = '#fff';
-        ctx.font = '16px Arial';
-        ctx.fillText('x_n = 1 + 1/n  ->  1', 20, 30);
-        ctx.fillText('n = ' + n, 20, 55);
-        
-        if (n > 50) clearInterval(convAnim);
-    }, 100);
-}
-
-function resetConvergence() {
-    if (convAnim) clearInterval(convAnim);
-    const canvas = document.getElementById('convergenceCanvas');
-    const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#1a1a2e';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = '#fff';
-    ctx.font = '18px Arial';
-    ctx.fillText('Cliquez sur "Lancer animation"', 150, 150);
-}
-
-// ==================== CHAP 2: DIFFERENTIELLE ====================
-function updateDiff() {
-    const canvas = document.getElementById('diffCanvas');
-    const ctx = canvas.getContext('2d');
-    const h = parseInt(document.getElementById('hSlider').value) / 100;
-    
-    ctx.fillStyle = '#1a1a2e';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-    ctx.strokeStyle = '#667eea';
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    for (let px = 0; px < canvas.width; px++) {
-        let x = (px - 100) / 100;
-        let y = x * x * x;
-        let py = 300 - y * 50;
-        if (px === 0) ctx.moveTo(px, py);
-        else ctx.lineTo(px, py);
-    }
-    ctx.stroke();
-    
-    let x0 = 1, y0 = 1;
-    let px0 = 100 + x0 * 100, py0 = 300 - y0 * 50;
-    
-    ctx.fillStyle = '#ffc107';
-    ctx.beginPath(); ctx.arc(px0, py0, 8, 0, 2*Math.PI); ctx.fill();
-    ctx.fillStyle = '#fff';
-    ctx.font = '14px Arial';
-    ctx.fillText('x', px0 - 5, py0 - 15);
-    
-    let x1 = x0 + h, y1 = x1*x1*x1;
-    let px1 = 100 + x1 * 100, py1 = 300 - y1 * 50;
-    
-    ctx.fillStyle = '#e94560';
-    ctx.beginPath(); ctx.arc(px1, py1, 6, 0, 2*Math.PI); ctx.fill();
-    ctx.fillStyle = '#fff';
-    ctx.fillText('x+h', px1, py1 - 15);
-    
-    ctx.strokeStyle = '#e94560';
-    ctx.lineWidth = 2;
-    ctx.setLineDash([5, 5]);
-    ctx.beginPath();
-    let tanY0 = 300 - (1 + 3*(-1)) * 50;
-    let tanY1 = 300 - (1 + 3*(2)) * 50;
-    ctx.moveTo(0, tanY0); ctx.lineTo(canvas.width, tanY1);
-    ctx.stroke();
-    ctx.setLineDash([]);
-    
-    let approxY = 1 + 3*h;
-    let pApprox = 300 - approxY * 50;
-    ctx.fillStyle = '#28a745';
-    ctx.beginPath(); ctx.arc(px1, pApprox, 6, 0, 2*Math.PI); ctx.fill();
-    ctx.fillStyle = '#fff';
-    ctx.fillText('f(x)+df(x)(h)', px1 + 10, pApprox);
-    
-    ctx.strokeStyle = '#ffc107';
-    ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.moveTo(px1, py1); ctx.lineTo(px1, pApprox); ctx.stroke();
-    ctx.fillStyle = '#ffc107';
-    ctx.fillText('o(||h||)', px1 + 5, (py1 + pApprox)/2);
-    
-    ctx.fillStyle = '#fff';
-    ctx.font = '16px Arial';
-    ctx.fillText('f(x) = x^3,  x = 1,  h = ' + h.toFixed(2), 20, 30);
-    ctx.fillText('f(x+h) = ' + y1.toFixed(3), 20, 55);
-    ctx.fillText('f(x)+df(x)(h) = ' + approxY.toFixed(3), 20, 80);
-    ctx.fillText('Erreur = ' + (y1 - approxY).toFixed(4), 20, 105);
-}
-
-function animateDiff() {
-    let h = 0.01;
-    let anim = setInterval(() => {
-        h += 0.02;
-        document.getElementById('hSlider').value = h * 100;
-        updateDiff();
-        if (h >= 1.5) {
-            clearInterval(anim);
-            setTimeout(() => {
-                let anim2 = setInterval(() => {
-                    h -= 0.02;
-                    document.getElementById('hSlider').value = h * 100;
-                    updateDiff();
-                    if (h <= 0.01) clearInterval(anim2);
-                }, 30);
-            }, 500);
-        }
-    }, 30);
-}
-
-// ==================== CHAP 2: BILINEAIRE ====================
-function updateBilinear() {
-    const canvas = document.getElementById('bilinearCanvas');
-    const ctx = canvas.getContext('2d');
-    const x = parseFloat(document.getElementById('bx').value);
-    const y = parseFloat(document.getElementById('by').value);
-    
-    ctx.fillStyle = '#1a1a2e';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-    ctx.strokeStyle = 'rgba(102, 126, 234, 0.3)';
-    ctx.lineWidth = 1;
-    for (let i = -3; i <= 3; i += 0.5) {
-        ctx.beginPath();
-        for (let j = -3; j <= 3; j += 0.1) {
-            let px = 300 + (i + j) * 50;
-            let py = 200 - (i * j) * 30 + (i - j) * 20;
-            if (j === -3) ctx.moveTo(px, py);
-            else ctx.lineTo(px, py);
-        }
-        ctx.stroke();
-    }
-    
-    let px = 300 + (x + y) * 50;
-    let py = 200 - (x * y) * 30 + (x - y) * 20;
-    
-    ctx.fillStyle = '#ffc107';
-    ctx.beginPath(); ctx.arc(px, py, 8, 0, 2*Math.PI); ctx.fill();
-    
-    ctx.strokeStyle = '#e94560';
-    ctx.lineWidth = 2;
-    ctx.setLineDash([3, 3]);
-    ctx.beginPath();
-    for (let dx = -1; dx <= 1; dx += 0.2) {
-        for (let dy = -1; dy <= 1; dy += 0.2) {
-            let tx = 300 + ((x+dx) + (y+dy)) * 50;
-            let ty = 200 - (x*y + x*dy + y*dx) * 30 + ((x+dx) - (y+dy)) * 20;
-            if (dy === -1) ctx.moveTo(tx, ty);
-            else ctx.lineTo(tx, ty);
-        }
-    }
-    ctx.stroke();
-    ctx.setLineDash([]);
-    
-    ctx.fillStyle = '#fff';
-    ctx.font = '16px Arial';
-    ctx.fillText('f(x,y) = xy', 20, 30);
-    ctx.fillText('Point: (' + x + ', ' + y + ')', 20, 55);
-    ctx.fillText('f(x,y) = ' + (x*y).toFixed(2), 20, 80);
-    ctx.fillText('df(h,k) = ' + x + '*k + ' + y + '*h', 20, 105);
-}
-
-function animateBilinear() {
-    let t = 0;
-    let anim = setInterval(() => {
-        t += 0.05;
-        document.getElementById('bx').value = (2 * Math.cos(t)).toFixed(1);
-        document.getElementById('by').value = (2 * Math.sin(t)).toFixed(1);
-        updateBilinear();
-        if (t > 4*Math.PI) clearInterval(anim);
-    }, 50);
-}
-
-// ==================== CHAP 3: DERIVEES DIRECTIONNELLES ====================
-let dirDirections = [];
-let dirAnim = null;
-
-function updateDir() {
-    const canvas = document.getElementById('dirCanvas');
-    const ctx = canvas.getContext('2d');
-    const theta = parseInt(document.getElementById('thetaSlider').value) * Math.PI / 180;
-    
-    ctx.fillStyle = '#1a1a2e';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-    const cx = 200, cy = 250;
-    
-    ctx.strokeStyle = 'rgba(102, 126, 234, 0.3)';
-    ctx.lineWidth = 1;
-    for (let r = 20; r <= 150; r += 20) {
-        ctx.beginPath(); ctx.arc(cx, cy, r, 0, 2*Math.PI); ctx.stroke();
-    }
-    
-    ctx.strokeStyle = '#667eea';
-    ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.moveTo(cx-180, cy); ctx.lineTo(cx+180, cy); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(cx, cy-180); ctx.lineTo(cx, cy+180); ctx.stroke();
-    
-    let px = cx + 60, py = cy - 60;
-    ctx.fillStyle = '#ffc107';
-    ctx.beginPath(); ctx.arc(px, py, 8, 0, 2*Math.PI); ctx.fill();
-    ctx.fillStyle = '#fff';
-    ctx.fillText('x=(1,1)', px + 10, py);
-    
-    let vx = Math.cos(theta) * 80, vy = -Math.sin(theta) * 80;
-    ctx.strokeStyle = '#e94560';
-    ctx.lineWidth = 3;
-    ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px + vx, py + vy); ctx.stroke();
-    ctx.fillStyle = '#e94560';
-    ctx.beginPath(); ctx.arc(px + vx, py + vy, 5, 0, 2*Math.PI); ctx.fill();
-    ctx.fillText('v', px + vx + 10, py + vy);
-    
-    ctx.strokeStyle = '#28a745';
-    ctx.lineWidth = 3;
-    ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px + 100, py - 100); ctx.stroke();
-    ctx.fillStyle = '#28a745';
-    ctx.fillText('grad f', px + 105, py - 105);
-    
-    dirDirections.forEach((d, i) => {
-        ctx.strokeStyle = 'hsl(' + (i * 60) + ', 70%, 60%)';
-        ctx.lineWidth = 2;
-        ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px + Math.cos(d)*60, py - Math.sin(d)*60); ctx.stroke();
-    });
-    
-    ctx.fillStyle = 'rgba(0,0,0,0.5)';
-    ctx.fillRect(420, 20, 260, 460);
-    ctx.strokeStyle = '#667eea';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(420, 20, 260, 460);
-    
-    ctx.fillStyle = '#fff';
-    ctx.font = 'bold 16px Arial';
-    ctx.fillText('Valeurs:', 440, 50);
-    
-    let grad = [2, 2];
-    let v = [Math.cos(theta), Math.sin(theta)];
-    let Dv = grad[0]*v[0] + grad[1]*v[1];
-    let maxDv = Math.sqrt(grad[0]**2 + grad[1]**2);
-    
-    ctx.font = '14px Arial';
-    ctx.fillText('Gradient: (2, 2)', 440, 80);
-    ctx.fillText('||grad|| = ' + maxDv.toFixed(3), 440, 105);
-    ctx.fillText('Direction v:', 440, 135);
-    ctx.fillText('  theta = ' + (theta*180/Math.PI).toFixed(0) + ' deg', 440, 160);
-    ctx.fillText('  v = (' + v[0].toFixed(2) + ', ' + v[1].toFixed(2) + ')', 440, 185);
-    ctx.fillText('D_v f = ' + Dv.toFixed(3), 440, 215);
-    ctx.fillStyle = Dv >= maxDv - 0.01 ? '#28a745' : '#fff';
-    ctx.fillText(Dv >= maxDv - 0.01 ? 'MAXIMUM!' : '', 440, 245);
-}
-
-function startDirAnimation() {
-    let theta = 0;
-    if (dirAnim) clearInterval(dirAnim);
-    dirAnim = setInterval(() => {
-        theta += 2;
-        document.getElementById('thetaSlider').value = theta;
-        updateDir();
-        if (theta >= 360) clearInterval(dirAnim);
-    }, 30);
-}
-
-function addDirection() {
-    dirDirections.push(parseInt(document.getElementById('thetaSlider').value) * Math.PI / 180);
-    updateDir();
-}
-
-function drawSurfaceDir(dir) {
-    const canvas = document.getElementById('surfaceDirCanvas');
-    const ctx = canvas.getContext('2d');
-    
-    ctx.fillStyle = '#1a1a2e';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-    // Simple 3D surface projection
-    ctx.strokeStyle = 'rgba(102, 126, 234, 0.5)';
-    ctx.lineWidth = 1;
-    for (let i = -2; i <= 2; i += 0.3) {
-        ctx.beginPath();
-        for (let j = -2; j <= 2; j += 0.1) {
-            let px = 300 + (i + j) * 60;
-            let py = 200 - (i*i + j*j) * 30 + (i - j) * 20;
-            if (j === -2) ctx.moveTo(px, py);
-            else ctx.lineTo(px, py);
-        }
-        ctx.stroke();
-    }
-    
-    let x0 = 1, y0 = 1;
-    let px0 = 300 + (x0 + y0) * 60;
-    let py0 = 200 - (x0*x0 + y0*y0) * 30 + (x0 - y0) * 20;
-    
-    ctx.fillStyle = '#ffc107';
-    ctx.beginPath(); ctx.arc(px0, py0, 8, 0, 2*Math.PI); ctx.fill();
-    
-    let dirs = [[1,0], [0,1], [1,1], [2,2]];
-    let d = dirs[dir];
-    let dx = d[0], dy = d[1];
-    let len = Math.sqrt(dx*dx + dy*dy);
-    dx /= len; dy /= len;
-    
-    ctx.strokeStyle = '#e94560';
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.moveTo(px0, py0);
-    for (let t = 0; t <= 1.5; t += 0.1) {
-        let x = x0 + t*dx;
-        let y = y0 + t*dy;
-        let px = 300 + (x + y) * 60;
-        let py = 200 - (x*x + y*y) * 30 + (x - y) * 20;
-        ctx.lineTo(px, py);
-    }
-    ctx.stroke();
-    
-    ctx.fillStyle = '#fff';
-    ctx.font = '16px Arial';
-    let labels = ['Direction x', 'Direction y', 'Diagonale', 'Direction gradient'];
-    ctx.fillText(labels[dir], 20, 30);
-    
-    let grad = [2, 2];
-    let Dv = grad[0]*dx + grad[1]*dy;
-    ctx.fillText('D_v f(1,1) = ' + Dv.toFixed(3), 20, 55);
-}
-
-// ==================== CHAP 4: NORME OPERATEUR ====================
-function updateOperator() {
-    const canvas = document.getElementById('operatorCanvas');
-    const ctx = canvas.getContext('2d');
-    const fx = parseFloat(document.getElementById('opX').value);
-    const fy = parseFloat(document.getElementById('opY').value);
-    
-    ctx.fillStyle = '#1a1a2e';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-    // E space (left)
-    ctx.strokeStyle = '#667eea';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(50, 50, 250, 300);
-    ctx.fillStyle = '#667eea';
-    ctx.font = '18px Arial';
-    ctx.fillText('E', 30, 40);
-    
-    // F space (right)
-    ctx.strokeStyle = '#e94560';
-    ctx.strokeRect(400, 50, 250, 300);
-    ctx.fillStyle = '#e94560';
-    ctx.fillText('F', 640, 40);
-    
-    // Unit circle in E
-    let cx1 = 175, cy1 = 200;
-    ctx.strokeStyle = '#667eea';
-    ctx.lineWidth = 2;
-    ctx.setLineDash([5, 5]);
-    ctx.beginPath(); ctx.arc(cx1, cy1, 80, 0, 2*Math.PI); ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.fillStyle = 'rgba(102, 126, 234, 0.1)';
-    ctx.fill();
-    
-    // Ellipse in F (image)
-    let cx2 = 525, cy2 = 200;
-    ctx.strokeStyle = '#e94560';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    for (let theta = 0; theta <= 2*Math.PI; theta += 0.01) {
-        let x = fx * 80 * Math.cos(theta);
-        let y = fy * 80 * Math.sin(theta);
-        if (theta === 0) ctx.moveTo(cx2 + x, cy2 + y);
-        else ctx.lineTo(cx2 + x, cy2 + y);
-    }
-    ctx.closePath();
-    ctx.stroke();
-    ctx.fillStyle = 'rgba(233, 69, 96, 0.1)';
-    ctx.fill();
-    
-    // Arrow
-    ctx.strokeStyle = '#ffc107';
-    ctx.lineWidth = 3;
-    ctx.beginPath(); ctx.moveTo(320, 200); ctx.lineTo(380, 200); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(370, 190); ctx.lineTo(380, 200); ctx.lineTo(370, 210); ctx.stroke();
-    ctx.fillStyle = '#ffc107';
-    ctx.fillText('u', 340, 185);
-    
-    // Norm value
-    let norm = Math.max(fx, fy);
-    ctx.fillStyle = '#fff';
-    ctx.font = '16px Arial';
-    ctx.fillText('||u|| = max(' + fx + ', ' + fy + ') = ' + norm.toFixed(2), 50, 380);
-}
-
-function animateOperator() {
-    let t = 0;
-    let anim = setInterval(() => {
-        t += 0.05;
-        document.getElementById('opX').value = (2 + Math.sin(t)).toFixed(1);
-        document.getElementById('opY').value = (1.5 + Math.cos(t*1.3)).toFixed(1);
-        updateOperator();
-        if (t > 4*Math.PI) clearInterval(anim);
-    }, 50);
-}
-
-function showNormDef(def) {
-    const canvas = document.getElementById('normOpCanvas');
-    const ctx = canvas.getContext('2d');
-    
-    ctx.fillStyle = '#1a1a2e';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-    ctx.fillStyle = '#fff';
-    ctx.font = '18px Arial';
-    
-    if (def === 1) {
-        ctx.fillText('||u|| = sup_{||x|| <= 1} ||u(x)||', 50, 50);
-        ctx.fillText('On regarde l\'image de la BOULE UNITE FERMEE', 50, 80);
-        
-        ctx.strokeStyle = '#667eea';
-        ctx.setLineDash([5, 5]);
-        ctx.beginPath(); ctx.arc(200, 200, 100, 0, 2*Math.PI); ctx.stroke();
-        ctx.setLineDash([]);
-        ctx.fillStyle = 'rgba(102, 126, 234, 0.2)';
-        ctx.fill();
-        
-        ctx.fillStyle = '#e94560';
-        ctx.beginPath(); ctx.arc(200, 200, 150, 0, 2*Math.PI); ctx.stroke();
-        ctx.fillText('Image: plus grand ||u(x)||', 350, 200);
-    } else if (def === 2) {
-        ctx.fillText('||u|| = sup_{||x|| = 1} ||u(x)||', 50, 50);
-        ctx.fillText('On regarde l\'image de la SPHERE UNITE', 50, 80);
-        
-        ctx.strokeStyle = '#667eea';
-        ctx.lineWidth = 3;
-        ctx.beginPath(); ctx.arc(200, 200, 100, 0, 2*Math.PI); ctx.stroke();
-        
-        ctx.fillStyle = '#e94560';
-        ctx.beginPath(); ctx.arc(200, 200, 150, 0, 2*Math.PI); ctx.stroke();
-        ctx.fillText('Le max est ATTEINT sur le bord', 350, 200);
-    } else {
-        ctx.fillText('||u|| = sup_{x != 0} ||u(x)|| / ||x||', 50, 50);
-        ctx.fillText('Rapport de croissance', 50, 80);
-        
-        ctx.strokeStyle = '#667eea';
-        ctx.beginPath(); ctx.moveTo(100, 300); ctx.lineTo(500, 300); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(100, 300); ctx.lineTo(100, 100); ctx.stroke();
-        
-        ctx.fillStyle = '#ffc107';
-        for (let i = 1; i <= 10; i++) {
-            let x = 100 + i * 35;
-            let y = 300 - i * 15;
-            ctx.beginPath(); ctx.arc(x, y, 4, 0, 2*Math.PI); ctx.fill();
-        }
-        
-        ctx.fillStyle = '#fff';
-        ctx.fillText('||u(x)|| / ||x|| = constante = ||u||', 350, 200);
-    }
-}
-
-// ==================== CHAP 5: FONCTIONS IMPLICITES ====================
-function updateImplicit() {
-    const canvas = document.getElementById('implicitCanvas');
-    const ctx = canvas.getContext('2d');
-    const x0 = parseFloat(document.getElementById('impX').value);
-    const y0 = parseFloat(document.getElementById('impY').value);
-    
-    ctx.fillStyle = '#1a1a2e';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-    // Draw implicit curve f(x,y) = x^4 + x^3*y^2 - y + y^2 + y^3 - 1 = 0
-    ctx.strokeStyle = 'rgba(102, 126, 234, 0.5)';
-    ctx.lineWidth = 1;
-    for (let px = 0; px < canvas.width; px += 3) {
-        for (let py = 0; py < canvas.height; py += 3) {
-            let x = (px - 300) / 100;
-            let y = -(py - 300) / 100;
-            let f = x*x*x*x + x*x*x*y*y - y + y*y + y*y*y - 1;
-            if (Math.abs(f) < 0.1) {
-                ctx.fillStyle = 'rgba(102, 126, 234, 0.5)';
-                ctx.fillRect(px, py, 3, 3);
-            }
-        }
-    }
-    
-    // Point (x0, y0)
-    let px = 300 + x0 * 100;
-    let py = 300 - y0 * 100;
-    
-    ctx.fillStyle = '#ffc107';
-    ctx.beginPath(); ctx.arc(px, py, 8, 0, 2*Math.PI); ctx.fill();
-    ctx.fillStyle = '#fff';
-    ctx.font = '14px Arial';
-    ctx.fillText('(' + x0 + ', ' + y0 + ')', px + 10, py);
-    
-    // Tangent line
-    let dfdx = 4*x0*x0*x0 + 3*x0*x0*y0*y0;
-    let dfdy = 2*x0*x0*x0*y0 - 1 + 2*y0 + 3*y0*y0;
-    
-    if (Math.abs(dfdy) > 0.01) {
-        let slope = -dfdx / dfdy;
-        ctx.strokeStyle = '#e94560';
-        ctx.lineWidth = 2;
-        ctx.setLineDash([5, 5]);
-        ctx.beginPath();
-        ctx.moveTo(px - 100, py + slope * 100);
-        ctx.lineTo(px + 100, py - slope * 100);
-        ctx.stroke();
-        ctx.setLineDash([]);
-        
-        ctx.fillStyle = '#e94560';
-        ctx.fillText('Tangente: dy/dx = ' + slope.toFixed(2), 20, 480);
-    }
-    
-    ctx.fillStyle = '#fff';
-    ctx.font = '16px Arial';
-    ctx.fillText('f(x,y) = x^4 + x^3*y^2 - y + y^2 + y^3 - 1 = 0', 20, 30);
-}
-
-function animateImplicit() {
-    let t = 0;
-    let anim = setInterval(() => {
-        t += 0.05;
-        document.getElementById('impX').value = (Math.cos(t) * 1.5).toFixed(1);
-        document.getElementById('impY').value = (1 + Math.sin(t) * 0.5).toFixed(1);
-        updateImplicit();
-        if (t > 2*Math.PI) clearInterval(anim);
-    }, 50);
-}
-
-// ==================== EXERCICES ====================
-function checkEx1() {
-    let n1 = parseFloat(document.getElementById('ex1_1').value);
-    let n2 = parseFloat(document.getElementById('ex1_2').value);
-    let ninf = parseFloat(document.getElementById('ex1_inf').value);
-    
-    let correct = (n1 === 7) && (Math.abs(n2 - 5) < 0.1) && (ninf === 4);
-    let result = document.getElementById('ex1_result');
-    
-    if (correct) {
-        result.className = 'result correct';
-        result.textContent = 'Correct! ||x||_1 = 7, ||x||_2 = 5, ||x||_inf = 4';
-    } else {
-        result.className = 'result wrong';
-        result.textContent = 'Incorrect. Reessayez! Indice: ||x||_1 = |3|+|-4| = 7';
-    }
-}
-
-function checkEx2() {
-    let ans = document.getElementById('ex2').value.trim().toLowerCase();
-    let correct = ans.includes('4h') && ans.includes('k');
-    let result = document.getElementById('ex2_result');
-    
-    if (correct) {
-        result.className = 'result correct';
-        result.textContent = 'Correct! d_{(1,2)} f(h,k) = 4h + k';
-    } else {
-        result.className = 'result wrong';
-        result.textContent = 'Incorrect. Indice: df = 2xy*h + x^2*k = 4h + k';
-    }
-}
-
-function checkEx3() {
-    let ans = parseFloat(document.getElementById('ex3').value);
-    let correct = Math.abs(ans - 2.83) < 0.1;
-    let result = document.getElementById('ex3_result');
-    
-    if (correct) {
-        result.className = 'result correct';
-        result.textContent = 'Correct! D_v f = 2*0.707 + 2*0.707 = 2.83';
-    } else {
-        result.className = 'result wrong';
-        result.textContent = 'Incorrect. Indice: D_v f = grad f . v = (2,2).(1,1)/sqrt(2)';
-    }
-}
-
-function checkEx4() {
-    let ans = parseFloat(document.getElementById('ex4').value);
-    let correct = Math.abs(ans - 0) < 0.1;
-    let result = document.getElementById('ex4_result');
-    
-    if (correct) {
-        result.className = 'result correct';
-        result.textContent = 'Correct! dy/dx = -2x/2y = 0 en (0,1)';
-    } else {
-        result.className = 'result wrong';
-        result.textContent = 'Incorrect. Indice: Derivez implicitement: 2x + 2y*dy/dx = 0';
-    }
-}
-
-// ==================== SIMULATEUR ====================
-function updateSim() {
-    const canvas = document.getElementById('simCanvas');
-    const ctx = canvas.getContext('2d');
-    const x = parseFloat(document.getElementById('simX').value);
-    const y = parseFloat(document.getElementById('simY').value);
-    
-    ctx.fillStyle = '#1a1a2e';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-    let cx = canvas.width / 2, cy = canvas.height / 2;
-    let scale = 30;
-    
-    // Grid
-    ctx.strokeStyle = 'rgba(255,255,255,0.1)';
-    for (let i = -10; i <= 10; i++) {
-        ctx.beginPath(); ctx.moveTo(cx + i*scale, 0); ctx.lineTo(cx + i*scale, canvas.height); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(0, cy + i*scale); ctx.lineTo(canvas.width, cy + i*scale); ctx.stroke();
-    }
-    
-    // Axes
-    ctx.strokeStyle = '#667eea';
-    ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.moveTo(cx, 0); ctx.lineTo(cx, canvas.height); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(0, cy); ctx.lineTo(canvas.width, cy); ctx.stroke();
-    
-    // Vector
-    ctx.strokeStyle = '#e94560';
-    ctx.lineWidth = 3;
-    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + x*scale, cy - y*scale); ctx.stroke();
-    ctx.fillStyle = '#e94560';
-    ctx.beginPath(); ctx.arc(cx + x*scale, cy - y*scale, 6, 0, 2*Math.PI); ctx.fill();
-    
-    // Norms
-    let n1 = Math.abs(x) + Math.abs(y);
-    let n2 = Math.sqrt(x*x + y*y);
-    let ninf = Math.max(Math.abs(x), Math.abs(y));
-    
-    // Draw norm balls
-    ctx.strokeStyle = 'rgba(255, 193, 7, 0.5)';
-    ctx.setLineDash([3, 3]);
-    ctx.beginPath(); ctx.arc(cx, cy, n1*scale, 0, 2*Math.PI); ctx.stroke();
-    ctx.strokeStyle = 'rgba(40, 167, 69, 0.5)';
-    ctx.beginPath(); ctx.arc(cx, cy, n2*scale, 0, 2*Math.PI); ctx.stroke();
-    ctx.strokeStyle = 'rgba(233, 69, 96, 0.5)';
-    ctx.strokeRect(cx - ninf*scale, cy - ninf*scale, 2*ninf*scale, 2*ninf*scale);
-    ctx.setLineDash([]);
-    
-    document.getElementById('simResults').innerHTML = 
-        '<span style="color:#ffc107">||v||_1 = ' + n1.toFixed(2) + '</span> | ' +
-        '<span style="color:#28a745">||v||_2 = ' + n2.toFixed(2) + '</span> | ' +
-        '<span style="color:#e94560">||v||_inf = ' + ninf.toFixed(2) + '</span>';
-}
-
-// ==================== INIT ====================
-window.onload = function() {
-    drawNorm(2);
-    drawBall();
-    resetConvergence();
+const COLORS = {
+  accent: '#c0392b',
+  blue: '#2471a3',
+  green: '#1e8449',
+  purple: '#8e44ad',
+  gold: '#d4ac0d',
+  ink: '#1a1209',
+  grid: '#e8dfc8',
+  paper: '#fdf6e3',
 };
-</script>
 
+function setupCanvas(id){
+  const c = document.getElementById(id);
+  if(!c) return null;
+  const ctx = c.getContext('2d');
+  const dpr = window.devicePixelRatio||1;
+  const W = c.width, H = c.height;
+  c.width = W*dpr; c.height = H*dpr;
+  c.style.width = W+'px'; c.style.height = H+'px';
+  ctx.scale(dpr,dpr);
+  return {ctx, W, H};
+}
+
+function drawAxes(ctx, W, H, ox, oy, scale, labels=true){
+  ctx.save();
+  ctx.strokeStyle = COLORS.ink;
+  ctx.lineWidth = 1.2;
+  ctx.globalAlpha = 0.35;
+  // Grid
+  ctx.strokeStyle = COLORS.grid;
+  ctx.lineWidth = 0.7;
+  for(let i=-10;i<=10;i++){
+    const x = ox+i*scale;
+    const y = oy+i*scale;
+    ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+  // Axes
+  ctx.strokeStyle = COLORS.ink;
+  ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(0,oy); ctx.lineTo(W,oy); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(ox,0); ctx.lineTo(ox,H); ctx.stroke();
+  // Arrows
+  ctx.fillStyle = COLORS.ink;
+  ctx.beginPath(); ctx.moveTo(W-6,oy-5); ctx.lineTo(W,oy); ctx.lineTo(W-6,oy+5); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(ox-5,6); ctx.lineTo(ox,0); ctx.lineTo(ox+5,6); ctx.fill();
+  if(labels){
+    ctx.font = '12px JetBrains Mono, monospace';
+    ctx.fillStyle = COLORS.ink;
+    ctx.fillText('x', W-12, oy-8);
+    ctx.fillText('y', ox+8, 10);
+  }
+  ctx.restore();
+}
+
+// ============================================================
+// CANVAS 1: NORM AXIOMS
+// ============================================================
+(function(){
+  const r = setupCanvas('c-norm-axioms');
+  if(!r) return;
+  const {ctx,W,H} = r;
+  const ox=W/2, oy=H/2, scale=55;
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle = COLORS.paper;
+    ctx.fillRect(0,0,W,H);
+    drawAxes(ctx,W,H,ox,oy,scale);
+
+    const uVal = parseFloat(document.getElementById('ax-u')?.value||1.5);
+    const lam = parseFloat(document.getElementById('ax-lam')?.value||1.5);
+
+    // u vector
+    const ux=ox+uVal*scale, uy=oy-uVal*0.6*scale;
+    ctx.save();
+    ctx.strokeStyle=COLORS.accent; ctx.lineWidth=2.5;
+    ctx.beginPath(); ctx.moveTo(ox,oy); ctx.lineTo(ux,uy); ctx.stroke();
+    arrow(ctx,ox,oy,ux,uy,COLORS.accent);
+    ctx.fillStyle=COLORS.accent; ctx.font='bold 13px EB Garamond';
+    ctx.fillText('u',ux+8,uy-4);
+    // norm label
+    const nu = Math.sqrt(uVal**2+(uVal*0.6)**2);
+    ctx.fillStyle='#555'; ctx.font='12px JetBrains Mono';
+    ctx.fillText('‖u‖ = '+nu.toFixed(2)*(scale/55)|0,(ux+ox)/2+10,(uy+oy)/2-12);
+    ctx.restore();
+
+    // λu vector
+    const lux=ox+lam*uVal*scale, luy=oy-lam*uVal*0.6*scale;
+    ctx.save();
+    ctx.strokeStyle=COLORS.blue; ctx.lineWidth=2;
+    ctx.setLineDash([5,4]);
+    ctx.beginPath(); ctx.moveTo(ox,oy); ctx.lineTo(lux,luy); ctx.stroke();
+    ctx.setLineDash([]);
+    arrow(ctx,ox,oy,lux,luy,COLORS.blue);
+    ctx.fillStyle=COLORS.blue; ctx.font='bold 13px EB Garamond';
+    ctx.fillText('λu',lux+8,luy-4);
+    const nlu=Math.abs(lam)*nu;
+    ctx.fillStyle='#333'; ctx.font='11px JetBrains Mono';
+    ctx.fillText('‖λu‖=|λ|‖u‖',10,H-12);
+    ctx.restore();
+
+    // v vector (for triangle ineq)
+    const vx=ox-0.6*scale, vy=oy-uVal*0.8*scale;
+    ctx.save();
+    ctx.strokeStyle=COLORS.green; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(ox,oy); ctx.lineTo(vx,vy); ctx.stroke();
+    arrow(ctx,ox,oy,vx,vy,COLORS.green);
+    ctx.fillStyle=COLORS.green; ctx.font='bold 13px EB Garamond';
+    ctx.fillText('v',vx-16,vy-4);
+    // u+v
+    const uvx=ox+(uVal-0.6)*scale, uvy=oy-(uVal*0.6+uVal*0.8)*scale;
+    ctx.strokeStyle=COLORS.purple; ctx.lineWidth=2;
+    ctx.setLineDash([3,3]);
+    ctx.beginPath(); ctx.moveTo(ox,oy); ctx.lineTo(uvx,uvy); ctx.stroke();
+    ctx.setLineDash([]);
+    arrow(ctx,ox,oy,uvx,uvy,COLORS.purple);
+    ctx.fillStyle=COLORS.purple; ctx.font='bold 12px EB Garamond';
+    ctx.fillText('u+v',uvx+6,uvy-4);
+    ctx.restore();
+
+    // Axiom labels
+    ctx.save();
+    ctx.fillStyle=COLORS.ink; ctx.font='11px JetBrains Mono';
+    ctx.fillText('① ‖x‖≥0, =0⟺x=0',8,18);
+    ctx.fillStyle=COLORS.blue;
+    ctx.fillText('② ‖λu‖=|λ|‖u‖',8,32);
+    ctx.fillStyle=COLORS.purple;
+    ctx.fillText('③ ‖u+v‖≤‖u‖+‖v‖',8,46);
+    ctx.restore();
+  }
+
+  function arrow(ctx,x1,y1,x2,y2,color){
+    const dx=x2-x1,dy=y2-y1;
+    const len=Math.sqrt(dx*dx+dy*dy);
+    if(len<1)return;
+    const ux=dx/len,uy=dy/len;
+    const L=10,W=5;
+    ctx.save();
+    ctx.fillStyle=color;
+    ctx.beginPath();
+    ctx.moveTo(x2,y2);
+    ctx.lineTo(x2-L*ux-W*uy,y2-L*uy+W*ux);
+    ctx.lineTo(x2-L*ux+W*uy,y2-L*uy-W*ux);
+    ctx.closePath();ctx.fill();
+    ctx.restore();
+  }
+
+  ['ax-u','ax-lam'].forEach(id=>{
+    document.getElementById(id)?.addEventListener('input',draw);
+  });
+  draw();
+})();
+
+// ============================================================
+// CANVAS 2: LP NORMS (unit ball)
+// ============================================================
+(function(){
+  const r = setupCanvas('c-norms-rn');
+  if(!r) return;
+  const {ctx,W,H} = r;
+  const ox=W/2, oy=H/2, scale=90;
+
+  function lpNorm(x,y,p){
+    if(p>=100) return Math.max(Math.abs(x),Math.abs(y));
+    return Math.pow(Math.pow(Math.abs(x),p)+Math.pow(Math.abs(y),p),1/p);
+  }
+
+  function drawBall(p, color, lw, dash=[]){
+    ctx.save();
+    ctx.strokeStyle=color; ctx.lineWidth=lw;
+    ctx.setLineDash(dash);
+    ctx.globalAlpha=0.85;
+    ctx.beginPath();
+    let first=true;
+    for(let a=0;a<=2*Math.PI+0.01;a+=0.02){
+      // find r such that ‖r*(cos,sin)‖_p = 1
+      const c=Math.cos(a),s=Math.sin(a);
+      const n=lpNorm(c,s,p);
+      const r=1/n;
+      const px=ox+r*c*scale, py=oy-r*s*scale;
+      if(first){ctx.moveTo(px,py);first=false;}
+      else ctx.lineTo(px,py);
+    }
+    ctx.closePath();ctx.stroke();
+    ctx.restore();
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle=COLORS.paper; ctx.fillRect(0,0,W,H);
+    drawAxes(ctx,W,H,ox,oy,scale);
+    drawBall(1,COLORS.accent,2);
+    drawBall(2,COLORS.blue,2);
+    drawBall(100,COLORS.green,2);
+    const p=parseFloat(document.getElementById('p-val')?.value||2);
+    document.getElementById('p-display').textContent=p.toFixed(1);
+    drawBall(p,COLORS.purple,2.5,[4,3]);
+    // axis marks
+    ctx.save();
+    ctx.fillStyle=COLORS.ink; ctx.font='10px JetBrains Mono';
+    ctx.fillText('1',ox+scale-4,oy+14);
+    ctx.fillText('-1',ox-scale-14,oy+14);
+    ctx.fillText('1',ox+6,oy-scale+4);
+    ctx.restore();
+  }
+
+  document.getElementById('p-val')?.addEventListener('input',draw);
+  draw();
+})();
+
+// ============================================================
+// CANVAS: EQUIV NORMS
+// ============================================================
+(function(){
+  const r = setupCanvas('c-equiv');
+  if(!r) return;
+  const {ctx,W,H} = r;
+  const ox=W/2,oy=H/2,scale=85;
+
+  function drawCircle(cx,cy,rx,ry,color,lw,dash=[]){
+    ctx.save();
+    ctx.strokeStyle=color; ctx.lineWidth=lw; ctx.setLineDash(dash);
+    ctx.beginPath();
+    ctx.ellipse(cx,cy,rx,ry,0,0,2*Math.PI);
+    ctx.stroke(); ctx.restore();
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle=COLORS.paper; ctx.fillRect(0,0,W,H);
+    drawAxes(ctx,W,H,ox,oy,scale);
+    const a=parseFloat(document.getElementById('equiv-a')?.value||0.5);
+    const b=parseFloat(document.getElementById('equiv-b')?.value||1.8);
+    // outer: beta * N1 ball
+    drawCircle(ox,oy,b*scale,b*scale,COLORS.accent,1.5,[4,4]);
+    // N2 ball (unit circle)
+    drawCircle(ox,oy,scale,scale*0.7,COLORS.blue,2.5);
+    // inner: alpha * N1 ball
+    drawCircle(ox,oy,a*scale,a*scale,COLORS.accent,1.5,[4,4]);
+    // Fill
+    ctx.save();
+    ctx.strokeStyle=COLORS.blue; ctx.lineWidth=0;
+    ctx.fillStyle='rgba(36,113,163,0.07)';
+    ctx.beginPath();ctx.ellipse(ox,oy,scale,scale*0.7,0,0,2*Math.PI);ctx.fill();
+    ctx.restore();
+    // Labels
+    ctx.save();
+    ctx.fillStyle=COLORS.accent; ctx.font='11px JetBrains Mono';
+    ctx.fillText('β·B₁',ox+b*scale+4,oy);
+    ctx.fillText('α·B₁',ox+a*scale+4,oy);
+    ctx.fillStyle=COLORS.blue;
+    ctx.fillText('B₂',ox+scale*0.7+4,oy-scale*0.7*0.7);
+    ctx.fillStyle='#555'; ctx.font='12px EB Garamond';
+    ctx.fillText('α='+a.toFixed(2)+'  β='+b.toFixed(2),10,H-10);
+    ctx.restore();
+  }
+  ['equiv-a','equiv-b'].forEach(id=>document.getElementById(id)?.addEventListener('input',draw));
+  draw();
+})();
+
+// ============================================================
+// CANVAS: BALLS
+// ============================================================
+(function(){
+  const r = setupCanvas('c-balls');
+  if(!r) return;
+  const {ctx,W,H} = r;
+  const scale=75;
+  let clickPt=null;
+
+  function toScreen(x,y,cx,cy){
+    return [W/2+(x-cx)*scale, H/2-(y-cy)*scale];
+  }
+
+  function inBall(x,y,cx,cy,rad,norm){
+    const dx=x-cx,dy=y-cy;
+    if(norm==='1') return Math.abs(dx)+Math.abs(dy)<=rad;
+    if(norm==='inf') return Math.max(Math.abs(dx),Math.abs(dy))<=rad;
+    return Math.sqrt(dx*dx+dy*dy)<=rad;
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle=COLORS.paper; ctx.fillRect(0,0,W,H);
+    const cx=parseFloat(document.getElementById('ball-cx')?.value||0.3);
+    const rad=parseFloat(document.getElementById('ball-r')?.value||0.8);
+    const norm=document.getElementById('ball-norm')?.value||'2';
+
+    // Draw axes at center
+    drawAxes(ctx,W,H,W/2,H/2,scale);
+
+    // Draw closed ball (fill)
+    ctx.save();
+    ctx.fillStyle='rgba(36,113,163,0.10)';
+    ctx.strokeStyle=COLORS.blue; ctx.lineWidth=2;
+    drawBallPath(ctx,cx,0,rad,norm,scale,W/2,H/2);
+    ctx.fill(); ctx.stroke();
+    ctx.restore();
+
+    // Draw open ball boundary (dashed)
+    ctx.save();
+    ctx.strokeStyle=COLORS.accent; ctx.lineWidth=1.5; ctx.setLineDash([5,4]);
+    drawBallPath(ctx,cx,0,rad,norm,scale,W/2,H/2);
+    ctx.stroke();
+    ctx.restore();
+
+    // Center dot
+    const [scx,scy]=toScreen(cx,0,0,0);
+    ctx.save();
+    ctx.fillStyle=COLORS.accent;
+    ctx.beginPath(); ctx.arc(scx,scy,5,0,2*Math.PI); ctx.fill();
+    ctx.fillStyle=COLORS.ink; ctx.font='11px JetBrains Mono';
+    ctx.fillText('a=('+cx.toFixed(1)+',0)',scx+8,scy-8);
+    ctx.restore();
+
+    // Click point
+    if(clickPt){
+      const inside = inBall(clickPt.x,clickPt.y,cx,0,rad,norm);
+      const onBoundary = inBall(clickPt.x,clickPt.y,cx,0,rad+0.05,norm)&&!inBall(clickPt.x,clickPt.y,cx,0,rad-0.05,norm);
+      const color = inside?COLORS.green:COLORS.accent;
+      const [spx,spy]=toScreen(clickPt.x,clickPt.y,0,0);
+      ctx.save();
+      ctx.fillStyle=color;
+      ctx.beginPath(); ctx.arc(spx,spy,7,0,2*Math.PI); ctx.fill();
+      ctx.fillStyle=color; ctx.font='bold 11px JetBrains Mono';
+      ctx.fillText(inside?'∈ B(a,r)':'∉ B(a,r)',spx+10,spy-8);
+      ctx.restore();
+    }
+
+    // Legend
+    ctx.save();
+    ctx.font='11px JetBrains Mono';
+    ctx.fillStyle=COLORS.blue; ctx.fillText('Boule fermée B̄(a,'+rad.toFixed(1)+')',8,18);
+    ctx.fillStyle=COLORS.accent; ctx.setLineDash([4,3]);
+    ctx.strokeStyle=COLORS.accent; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(8,28); ctx.lineTo(40,28); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle=COLORS.accent; ctx.fillText('Boule ouverte B(a,r)',44,32);
+    ctx.restore();
+  }
+
+  function drawBallPath(ctx,cx,cy,rad,norm,scale,ox,oy){
+    ctx.beginPath();
+    if(norm==='2'){
+      ctx.arc(ox+cx*scale,oy-cy*scale,rad*scale,0,2*Math.PI);
+    } else if(norm==='1'){
+      // diamond
+      ctx.moveTo(ox+(cx+rad)*scale, oy);
+      ctx.lineTo(ox+cx*scale, oy-rad*scale);
+      ctx.lineTo(ox+(cx-rad)*scale, oy);
+      ctx.lineTo(ox+cx*scale, oy+rad*scale);
+      ctx.closePath();
+    } else { // inf
+      ctx.rect(ox+(cx-rad)*scale,oy-rad*scale,2*rad*scale,2*rad*scale);
+    }
+  }
+
+  document.getElementById('c-balls')?.addEventListener('click',function(e){
+    const rect=this.getBoundingClientRect();
+    const px=(e.clientX-rect.left)/(rect.right-rect.left)*W;
+    const py=(e.clientY-rect.top)/(rect.bottom-rect.top)*H;
+    const mx=(px-W/2)/scale;
+    const my=-(py-H/2)/scale;
+    clickPt={x:mx,y:my};
+    draw();
+  });
+  ['ball-cx','ball-r','ball-norm'].forEach(id=>document.getElementById(id)?.addEventListener('input',draw));
+  draw();
+})();
+
+// ============================================================
+// CANVAS: CAUCHY
+// ============================================================
+let cauchyAnim=null, cauchyT=0;
+function animCauchy(){
+  cauchyT=0;
+  if(cauchyAnim) clearInterval(cauchyAnim);
+  cauchyAnim=setInterval(()=>{
+    cauchyT+=1;
+    drawCauchy();
+    if(cauchyT>60) clearInterval(cauchyAnim);
+  },50);
+}
+
+function drawCauchy(){
+  const r=setupCanvas('c-cauchy');
+  if(!r) return;
+  const {ctx,W,H}=r;
+  const ox=60, oy=H/2, xscale=(W-80)/15, yscale=90;
+  const eps=parseFloat(document.getElementById('cau-eps')?.value||0.3);
+  const type=document.getElementById('cau-type')?.value||'conv';
+
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle=COLORS.paper; ctx.fillRect(0,0,W,H);
+
+  // Axes
+  ctx.save();
+  ctx.strokeStyle=COLORS.ink; ctx.lineWidth=1.3;
+  ctx.beginPath(); ctx.moveTo(ox,20); ctx.lineTo(ox,H-20); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(ox-10,oy); ctx.lineTo(W-10,oy); ctx.stroke();
+  ctx.fillStyle=COLORS.ink; ctx.font='11px JetBrains Mono';
+  ctx.fillText('n',W-20,oy-8); ctx.fillText('xₙ',ox-30,22);
+  ctx.restore();
+
+  // Generate sequence
+  const N=Math.min(cauchyT||14,14);
+  let pts=[];
+  if(type==='conv'){
+    // Convergent: 1/n type
+    for(let n=1;n<=N;n++) pts.push({n,y:1/n+Math.sin(n)*0.05/n});
+  } else {
+    // Cauchy without limit (like partial sums of 1/n in a subspace)
+    for(let n=1;n<=N;n++){
+      let s=0; for(let k=1;k<=n;k++) s+=0.5/(k*k);
+      pts.push({n,y:0.6-s*0.5+Math.sin(n*2)*0.04/n});
+    }
+  }
+
+  // Draw epsilon band
+  const limY = type==='conv'?oy:oy-0.15*yscale;
+  ctx.save();
+  ctx.fillStyle='rgba(30,132,73,0.08)';
+  ctx.fillRect(ox,limY-eps*yscale,W-ox-10,2*eps*yscale);
+  ctx.strokeStyle=COLORS.green; ctx.lineWidth=1.5; ctx.setLineDash([5,4]);
+  ctx.beginPath(); ctx.moveTo(ox,limY-eps*yscale); ctx.lineTo(W-10,limY-eps*yscale); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(ox,limY+eps*yscale); ctx.lineTo(W-10,limY+eps*yscale); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle=COLORS.green; ctx.font='10px JetBrains Mono';
+  ctx.fillText('±ε',W-30,limY-eps*yscale-4);
+  ctx.restore();
+
+  // Limit line
+  if(type==='conv'){
+    ctx.save();
+    ctx.strokeStyle=COLORS.blue; ctx.lineWidth=1.5; ctx.setLineDash([8,4]);
+    ctx.beginPath(); ctx.moveTo(ox,oy); ctx.lineTo(W-10,oy); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle=COLORS.blue; ctx.font='bold 11px JetBrains Mono';
+    ctx.fillText('L=0 (limite)',W-90,oy-6);
+    ctx.restore();
+  } else {
+    ctx.save();
+    ctx.strokeStyle='#e67e22'; ctx.lineWidth=1.5; ctx.setLineDash([5,3]);
+    ctx.beginPath(); ctx.moveTo(ox,limY); ctx.lineTo(W-10,limY); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle='#e67e22'; ctx.font='bold 10px JetBrains Mono';
+    ctx.fillText('limite∉espace!',W-110,limY-6);
+    ctx.restore();
+  }
+
+  // Plot points and line
+  ctx.save();
+  ctx.strokeStyle=COLORS.accent; ctx.lineWidth=1.5;
+  ctx.beginPath();
+  pts.forEach((p,i)=>{
+    const x=ox+p.n*xscale;
+    const y=oy-p.y*yscale;
+    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+  pts.forEach(p=>{
+    const x=ox+p.n*xscale, y=oy-p.y*yscale;
+    ctx.fillStyle=COLORS.accent;
+    ctx.beginPath(); ctx.arc(x,y,4,0,2*Math.PI); ctx.fill();
+    ctx.fillStyle=COLORS.ink; ctx.font='9px JetBrains Mono';
+    ctx.fillText('x'+p.n,x-6,y-8);
+  });
+  ctx.restore();
+
+  // Title
+  ctx.save();
+  ctx.fillStyle=COLORS.ink; ctx.font='bold 11px EB Garamond';
+  ctx.fillText(type==='conv'?'Suite convergente (Cauchy + complète)':'Suite de Cauchy sans limite (non-complet)',10,14);
+  ctx.restore();
+}
+(function(){
+  ['cau-eps','cau-type'].forEach(id=>document.getElementById(id)?.addEventListener('input',drawCauchy));
+  drawCauchy();
+})();
+
+// ============================================================
+// CANVAS: COMPLETE
+// ============================================================
+let completeMode=true;
+function toggleComplete(){
+  completeMode=!completeMode;
+  document.getElementById('complete-label').textContent=
+    'Mode : '+(completeMode?'Espace complet (Banach)':'Espace non-complet');
+  drawComplete();
+}
+
+function drawComplete(){
+  const r=setupCanvas('c-complete');
+  if(!r) return;
+  const {ctx,W,H}=r;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle=COLORS.paper; ctx.fillRect(0,0,W,H);
+
+  const cx=W/2, cy=H/2;
+
+  // Draw space
+  ctx.save();
+  ctx.strokeStyle=completeMode?COLORS.blue:COLORS.accent;
+  ctx.lineWidth=2;
+  if(completeMode){
+    ctx.fillStyle='rgba(36,113,163,0.07)';
+    ctx.beginPath(); ctx.arc(cx,cy,130,0,2*Math.PI); ctx.fill(); ctx.stroke();
+    ctx.fillStyle=COLORS.blue; ctx.font='bold 13px EB Garamond';
+    ctx.fillText('E (Banach — complet)',cx-80,cy-140);
+  } else {
+    ctx.fillStyle='rgba(192,57,43,0.06)';
+    ctx.beginPath(); ctx.arc(cx,cy,130,0,2*Math.PI); ctx.fill();
+    ctx.setLineDash([6,4]); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle=COLORS.accent; ctx.font='bold 13px EB Garamond';
+    ctx.fillText('E (non-complet)',cx-60,cy-140);
+  }
+  ctx.restore();
+
+  // Draw spiral Cauchy sequence
+  let pts=[];
+  for(let i=0;i<18;i++){
+    const t=i/17;
+    const a=i*0.7;
+    const r=completeMode?100*Math.exp(-t*2):100*(0.8-t*0.6);
+    pts.push({x:cx+r*Math.cos(a),y:cy+r*Math.sin(a)});
+  }
+
+  ctx.save();
+  ctx.strokeStyle=COLORS.purple; ctx.lineWidth=1.5;
+  ctx.beginPath();
+  pts.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));
+  ctx.stroke();
+  pts.forEach((p,i)=>{
+    ctx.fillStyle=lerp2(COLORS.purple,'#e74c3c',i/17);
+    ctx.beginPath(); ctx.arc(p.x,p.y,i<pts.length-1?3:5,0,2*Math.PI); ctx.fill();
+  });
+  ctx.restore();
+
+  // Limit point
+  if(completeMode){
+    ctx.save();
+    ctx.fillStyle=COLORS.blue;
+    ctx.beginPath(); ctx.arc(cx,cy,9,0,2*Math.PI); ctx.fill();
+    ctx.fillStyle='white'; ctx.font='bold 10px JetBrains Mono';
+    ctx.textAlign='center';
+    ctx.fillText('L',cx,cy+4);
+    ctx.fillStyle=COLORS.blue; ctx.font='11px EB Garamond';
+    ctx.fillText('Limite L ∈ E ✓',cx,cy+22);
+    ctx.restore();
+  } else {
+    ctx.save();
+    // Point outside the space
+    ctx.fillStyle=COLORS.accent;
+    ctx.beginPath(); ctx.arc(cx+155,cy-30,9,0,2*Math.PI); ctx.fill();
+    ctx.fillStyle='white'; ctx.font='bold 10px JetBrains Mono';
+    ctx.textAlign='center';
+    ctx.fillText('L',cx+155,cy-26);
+    ctx.fillStyle=COLORS.accent; ctx.font='11px EB Garamond';
+    ctx.fillText('L ∉ E ✗',cx+155,cy-10);
+    ctx.textAlign='start';
+    // Arrow
+    const lx=pts[pts.length-1];
+    ctx.strokeStyle=COLORS.accent; ctx.lineWidth=1.5; ctx.setLineDash([4,3]);
+    ctx.beginPath(); ctx.moveTo(lx.x,lx.y); ctx.lineTo(cx+148,cy-30); ctx.stroke();
+    ctx.restore();
+  }
+
+  function lerp2(c1,c2,t){return c1;} // simplified
+}
+drawComplete();
+
+// ============================================================
+// CANVAS: COMPLETION
+// ============================================================
+(function(){
+  const r=setupCanvas('c-completion');
+  if(!r) return;
+  const {ctx,W,H}=r;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle=COLORS.paper; ctx.fillRect(0,0,W,H);
+
+  const ox=W/2, oy=H/2;
+  // Ê (completed) = large circle
+  ctx.save();
+  ctx.fillStyle='rgba(36,113,163,0.06)';
+  ctx.strokeStyle=COLORS.blue; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.arc(ox,oy,120,0,2*Math.PI); ctx.fill(); ctx.stroke();
+  ctx.fillStyle=COLORS.blue; ctx.font='bold 14px EB Garamond';
+  ctx.fillText('Ê  (complété — Banach)',ox-80,oy-128);
+  ctx.restore();
+
+  // E (original) = cloud-like scattered points
+  ctx.save();
+  ctx.fillStyle='rgba(192,57,43,0.08)';
+  ctx.strokeStyle=COLORS.accent; ctx.lineWidth=1.5; ctx.setLineDash([5,4]);
+  ctx.beginPath(); ctx.arc(ox,oy,75,0,2*Math.PI); ctx.fill(); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle=COLORS.accent; ctx.font='bold 12px EB Garamond';
+  ctx.fillText('E  (dense dans Ê)',ox-55,oy+90);
+  ctx.restore();
+
+  // Points of E (rational-like dots)
+  const ePoints=[];
+  for(let i=0;i<22;i++){
+    const a=i/22*2*Math.PI+0.2;
+    const rr=20+Math.random()*50;
+    ePoints.push({x:ox+rr*Math.cos(a),y:oy+rr*Math.sin(a)});
+  }
+  ePoints.forEach(p=>{
+    ctx.fillStyle=COLORS.accent;
+    ctx.beginPath(); ctx.arc(p.x,p.y,2.5,0,2*Math.PI); ctx.fill();
+  });
+
+  // Points of Ê \ E (limit points)
+  const missing=[
+    {x:ox+95,y:oy+30},{x:ox-90,y:oy+50},{x:ox+60,y:oy-100},
+    {x:ox-70,y:oy-80},{x:ox+100,y:oy-50},{x:ox-80,y:oy+30}
+  ];
+  missing.forEach(p=>{
+    ctx.fillStyle=COLORS.blue;
+    ctx.beginPath(); ctx.arc(p.x,p.y,4,0,2*Math.PI); ctx.fill();
+    ctx.strokeStyle='white'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.arc(p.x,p.y,4,0,2*Math.PI); ctx.stroke();
+  });
+
+  ctx.save();
+  ctx.font='10px JetBrains Mono';
+  ctx.fillStyle=COLORS.accent; ctx.fillText('• points de E',W-110,H-26);
+  ctx.fillStyle=COLORS.blue; ctx.fillText('• limites ajoutées',W-130,H-12);
+  ctx.restore();
+})();
+
+// ============================================================
+// CANVAS: OPEN/CLOSED topology
+// ============================================================
+(function(){
+  const r=setupCanvas('c-open-closed');
+  if(!r) return;
+  const {ctx,W,H}=r;
+  const ox=W/2,oy=H/2;
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle=COLORS.paper; ctx.fillRect(0,0,W,H);
+    drawAxes(ctx,W,H,ox,oy,70);
+    const type=document.getElementById('topo-type')?.value||'open';
+
+    if(type==='open'){
+      ctx.save();
+      ctx.fillStyle='rgba(36,113,163,0.12)';
+      ctx.beginPath(); ctx.arc(ox-20,oy+10,80,0,2*Math.PI); ctx.fill();
+      ctx.strokeStyle=COLORS.blue; ctx.lineWidth=2; ctx.setLineDash([5,4]);
+      ctx.beginPath(); ctx.arc(ox-20,oy+10,80,0,2*Math.PI); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle=COLORS.blue; ctx.font='bold 12px EB Garamond';
+      ctx.fillText('U ouvert',ox-55,oy-90);
+      ctx.fillStyle='#555'; ctx.font='11px JetBrains Mono';
+      ctx.fillText('∀x ∈ U, ∃r : B(x,r) ⊂ U',8,H-10);
+      ctx.restore();
+      // small ball inside
+      ctx.save();
+      ctx.strokeStyle=COLORS.green; ctx.lineWidth=1.2; ctx.setLineDash([3,2]);
+      ctx.beginPath(); ctx.arc(ox-10,oy+20,20,0,2*Math.PI); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle=COLORS.green;
+      ctx.beginPath(); ctx.arc(ox-10,oy+20,4,0,2*Math.PI); ctx.fill();
+      ctx.font='10px JetBrains Mono'; ctx.fillText('x',ox-7,oy+18);
+      ctx.restore();
+    } else if(type==='closed'){
+      ctx.save();
+      ctx.fillStyle='rgba(192,57,43,0.12)';
+      ctx.beginPath(); ctx.arc(ox+20,oy-10,90,0,2*Math.PI); ctx.fill();
+      ctx.strokeStyle=COLORS.accent; ctx.lineWidth=2.5;
+      ctx.beginPath(); ctx.arc(ox+20,oy-10,90,0,2*Math.PI); ctx.stroke();
+      ctx.fillStyle=COLORS.accent; ctx.font='bold 12px EB Garamond';
+      ctx.fillText('F fermé',ox-15,oy-106);
+      ctx.fillStyle='#555'; ctx.font='11px JetBrains Mono';
+      ctx.fillText('F = Ē  ou  E\\F ouvert',8,H-10);
+      ctx.restore();
+    } else if(type==='neither'){
+      ctx.save();
+      ctx.fillStyle='rgba(142,68,173,0.12)';
+      // half-open interval like [0,1)
+      const x1=ox-90,x2=ox+90,y=oy;
+      ctx.fillRect(x1,y-8,180,16);
+      // Closed on left
+      ctx.fillStyle=COLORS.purple;
+      ctx.beginPath(); ctx.arc(x1,y,6,0,2*Math.PI); ctx.fill();
+      // Open on right
+      ctx.strokeStyle=COLORS.purple; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.arc(x2,y,6,0,2*Math.PI); ctx.stroke();
+      ctx.fillStyle='white';
+      ctx.beginPath(); ctx.arc(x2,y,5,0,2*Math.PI); ctx.fill();
+      ctx.fillStyle=COLORS.purple; ctx.font='bold 12px EB Garamond';
+      ctx.fillText('[0, 1)  ni ouvert ni fermé',ox-80,oy-25);
+      ctx.font='10px JetBrains Mono';
+      ctx.fillText('0 inclus ●         1 exclu ○',ox-75,oy+28);
+      ctx.restore();
+    } else { // both
+      ctx.save();
+      ctx.fillStyle='rgba(30,132,73,0.10)';
+      ctx.beginPath(); ctx.arc(ox,oy,100,0,2*Math.PI); ctx.fill();
+      ctx.strokeStyle=COLORS.green; ctx.lineWidth=2.5;
+      ctx.beginPath(); ctx.arc(ox,oy,100,0,2*Math.PI); ctx.stroke();
+      ctx.fillStyle=COLORS.green; ctx.font='bold 12px EB Garamond';
+      ctx.fillText('E (tout l\'espace)',ox-65,oy-108);
+      ctx.fillStyle='#555'; ctx.font='11px JetBrains Mono';
+      ctx.fillText('∅ et E : ouverts ET fermés',8,H-10);
+      ctx.restore();
+    }
+  }
+  document.getElementById('topo-type')?.addEventListener('change',draw);
+  draw();
+})();
+
+// ============================================================
+// CANVAS: DENSE
+// ============================================================
+(function(){
+  const r=setupCanvas('c-dense');
+  if(!r) return;
+  const {ctx,W,H}=r;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle=COLORS.paper; ctx.fillRect(0,0,W,H);
+  const ox=W/2,oy=H/2;
+
+  // A (interior)
+  ctx.save();
+  ctx.fillStyle='rgba(36,113,163,0.15)';
+  ctx.beginPath(); ctx.arc(ox,oy,80,0,2*Math.PI); ctx.fill();
+  ctx.strokeStyle=COLORS.blue; ctx.lineWidth=2.5;
+  ctx.beginPath(); ctx.arc(ox,oy,80,0,2*Math.PI); ctx.stroke();
+  // Adhérence (larger)
+  ctx.fillStyle='rgba(36,113,163,0.05)';
+  ctx.strokeStyle=COLORS.blue; ctx.lineWidth=1.5; ctx.setLineDash([5,4]);
+  ctx.beginPath(); ctx.arc(ox,oy,105,0,2*Math.PI); ctx.fill(); ctx.stroke();
+  ctx.setLineDash([]);
+
+  ctx.fillStyle=COLORS.blue; ctx.font='bold 12px EB Garamond';
+  ctx.fillText('A',ox-4,oy-4);
+  ctx.fillText('Ā',ox+100,oy-80);
+
+  // Int(A)
+  ctx.fillStyle='rgba(30,132,73,0.15)';
+  ctx.beginPath(); ctx.arc(ox,oy,55,0,2*Math.PI); ctx.fill();
+  ctx.strokeStyle=COLORS.green; ctx.lineWidth=1.8;
+  ctx.beginPath(); ctx.arc(ox,oy,55,0,2*Math.PI); ctx.stroke();
+  ctx.fillStyle=COLORS.green;
+  ctx.fillText('Int(A)',ox-22,oy+55+16);
+
+  // Frontier
+  ctx.fillStyle=COLORS.gold;
+  for(let a=0;a<2*Math.PI;a+=0.3){
+    const fx=ox+80*Math.cos(a), fy=oy+80*Math.sin(a);
+    ctx.beginPath(); ctx.arc(fx,fy,3,0,2*Math.PI); ctx.fill();
+  }
+  ctx.fillStyle=COLORS.gold; ctx.font='11px JetBrains Mono';
+  ctx.fillText('∂A (frontière)',ox+82,oy-10);
+  ctx.restore();
+
+  ctx.save();
+  ctx.fillStyle=COLORS.ink; ctx.font='10px JetBrains Mono';
+  ctx.fillText('Int(A) ⊂ A ⊂ Ā',8,H-10);
+  ctx.restore();
+})();
+
+// ============================================================
+// CANVAS: LINEAR MAP
+// ============================================================
+(function(){
+  const r=setupCanvas('c-linear-map');
+  if(!r) return;
+  const {ctx,W,H}=r;
+  const half=W/2;
+  const scale=55;
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle=COLORS.paper; ctx.fillRect(0,0,W,H);
+
+    const a=parseFloat(document.getElementById('lm-a')?.value||1.2);
+    const b=parseFloat(document.getElementById('lm-b')?.value||0.5);
+    const c=parseFloat(document.getElementById('lm-c')?.value||0.3);
+    const d=parseFloat(document.getElementById('lm-d')?.value||1.5);
+
+    // Left: unit ball (E)
+    const ox1=half/2, oy=H/2;
+    drawAxes(ctx,half,H,ox1,oy,scale);
+    ctx.save();
+    ctx.fillStyle='rgba(36,113,163,0.12)';
+    ctx.strokeStyle=COLORS.blue; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.arc(ox1,oy,scale,0,2*Math.PI); ctx.fill(); ctx.stroke();
+    ctx.fillStyle=COLORS.blue; ctx.font='bold 11px JetBrains Mono';
+    ctx.fillText('B_E (boule unité)',ox1-55,20);
+    ctx.restore();
+
+    // Right: image T(B_E) = ellipse determined by matrix T=[[a,b],[c,d]]
+    const ox2=half+half/2, oy2=oy;
+    // Draw grid for right side
+    ctx.save();
+    ctx.globalAlpha=0.3;
+    ctx.strokeStyle=COLORS.grid; ctx.lineWidth=0.7;
+    for(let i=-5;i<=5;i++){
+      ctx.beginPath(); ctx.moveTo(half+i*scale+ox2-ox2,0); ctx.lineTo(half+i*scale+ox2-ox2,H); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(half,oy+i*scale); ctx.lineTo(W,oy+i*scale); ctx.stroke();
+    }
+    ctx.globalAlpha=1;
+    ctx.strokeStyle=COLORS.ink; ctx.lineWidth=1.3;
+    ctx.beginPath(); ctx.moveTo(half,oy2); ctx.lineTo(W,oy2); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(ox2,20); ctx.lineTo(ox2,H-20); ctx.stroke();
+    ctx.restore();
+
+    // Draw T(circle) by parametric
+    ctx.save();
+    ctx.fillStyle='rgba(192,57,43,0.12)';
+    ctx.strokeStyle=COLORS.accent; ctx.lineWidth=2;
+    ctx.beginPath();
+    for(let t=0;t<=2*Math.PI+0.01;t+=0.03){
+      const cosT=Math.cos(t),sinT=Math.sin(t);
+      const tx=a*cosT+b*sinT, ty=c*cosT+d*sinT;
+      const px=ox2+tx*scale, py=oy2-ty*scale;
+      if(t===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+    }
+    ctx.closePath(); ctx.fill(); ctx.stroke();
+    ctx.fillStyle=COLORS.accent; ctx.font='bold 11px JetBrains Mono';
+    ctx.fillText('T(B_E)',ox2-20,20);
+    ctx.restore();
+
+    // Arrow between
+    ctx.save();
+    ctx.strokeStyle=COLORS.ink; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(half-10,oy); ctx.lineTo(half+10,oy); ctx.stroke();
+    ctx.fillStyle=COLORS.ink;
+    ctx.beginPath(); ctx.moveTo(half+10,oy); ctx.lineTo(half+4,oy-5); ctx.lineTo(half+4,oy+5); ctx.closePath(); ctx.fill();
+    ctx.font='bold 11px JetBrains Mono';
+    ctx.fillText('T',half-4,oy-8);
+    ctx.restore();
+
+    // Matrix display
+    ctx.save();
+    ctx.fillStyle=COLORS.ink; ctx.font='10px JetBrains Mono';
+    ctx.fillText('['+a.toFixed(1)+' '+b.toFixed(1)+']',half+5,H-22);
+    ctx.fillText('['+c.toFixed(1)+' '+d.toFixed(1)+']',half+5,H-8);
+    // Norm estimate
+    const opNorm=Math.sqrt((a*a+b*b+c*c+d*d));
+    ctx.fillText('‖T‖≈'+opNorm.toFixed(2),half+95,H-12);
+    ctx.restore();
+  }
+
+  ['lm-a','lm-b','lm-c','lm-d'].forEach(id=>document.getElementById(id)?.addEventListener('input',draw));
+  draw();
+})();
+
+// ============================================================
+// CANVAS: ℓᵖ
+// ============================================================
+let lpData=null;
+function newLpSequence(){
+  lpData=[];
+  for(let n=0;n<12;n++) lpData.push((Math.random()*2-1)/Math.pow(n+1,0.8));
+  drawLp();
+}
+function drawLp(){
+  const r=setupCanvas('c-lp');
+  if(!r) return;
+  const {ctx,W,H}=r;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle=COLORS.paper; ctx.fillRect(0,0,W,H);
+  if(!lpData) newLpSequence();
+  const p=document.getElementById('lp-p')?.value||'2';
+  const ox=40,oy=H-40,bw=(W-60)/12,yscale=120;
+
+  // Axes
+  ctx.save();
+  ctx.strokeStyle=COLORS.ink; ctx.lineWidth=1.3;
+  ctx.beginPath(); ctx.moveTo(ox,20); ctx.lineTo(ox,oy+10); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(ox-10,oy); ctx.lineTo(W-10,oy); ctx.stroke();
+  ctx.restore();
+
+  let norm=0;
+  lpData.forEach((v,i)=>{
+    if(p==='inf') norm=Math.max(norm,Math.abs(v));
+    else norm+=Math.pow(Math.abs(v),parseFloat(p));
+  });
+  if(p!=='inf') norm=Math.pow(norm,1/parseFloat(p));
+
+  lpData.forEach((v,i)=>{
+    const x=ox+10+i*bw;
+    const barH=Math.abs(v)*yscale;
+    const barY=v>=0?oy-barH:oy;
+    const hue=i*20;
+    ctx.save();
+    ctx.fillStyle=`hsl(${200+i*12},65%,50%)`;
+    ctx.fillRect(x,barY,bw-4,barH);
+    ctx.strokeStyle='white'; ctx.lineWidth=0.5;
+    ctx.strokeRect(x,barY,bw-4,barH);
+    ctx.fillStyle=COLORS.ink; ctx.font='9px JetBrains Mono';
+    ctx.fillText(i,x+bw/2-5,oy+14);
+    ctx.restore();
+  });
+
+  ctx.save();
+  ctx.fillStyle=COLORS.ink; ctx.font='bold 12px EB Garamond';
+  ctx.fillText('Espace ℓ'+p+' — ‖x‖ = '+norm.toFixed(3),ox,15);
+  ctx.fillStyle='#888'; ctx.font='10px JetBrains Mono';
+  ctx.fillText('Indices n →',W-90,oy+30);
+  ctx.restore();
+}
+(function(){
+  document.getElementById('lp-p')?.addEventListener('change',drawLp);
+  newLpSequence();
+})();
+
+// ============================================================
+// CANVAS: C([a,b])
+// ============================================================
+let cfuncs=[];
+function newCFunc(){
+  const n=parseInt(document.getElementById('cf-n')?.value||3);
+  cfuncs=[];
+  for(let k=0;k<n;k++){
+    const c1=Math.random()*2-1, c2=Math.random()*2-1;
+    const f1=Math.random()*3+1, f2=Math.random()*2+0.5;
+    cfuncs.push({c1,c2,f1,f2,color:`hsl(${k*50+180},65%,45%)`});
+  }
+  drawCFunc();
+}
+function drawCFunc(){
+  const r=setupCanvas('c-cfunc');
+  if(!r) return;
+  const {ctx,W,H}=r;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle=COLORS.paper; ctx.fillRect(0,0,W,H);
+  if(!cfuncs.length) newCFunc();
+
+  const ox=30,oy=H/2,xscale=(W-50),yscale=80;
+  // Axes
+  ctx.save();
+  ctx.strokeStyle=COLORS.ink; ctx.lineWidth=1.2;
+  ctx.beginPath(); ctx.moveTo(ox,oy); ctx.lineTo(W-10,oy); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(ox,15); ctx.lineTo(ox,H-15); ctx.stroke();
+  ctx.fillStyle='#888'; ctx.font='10px JetBrains Mono';
+  ctx.fillText('[0',ox-4,H-4); ctx.fillText('1]',W-22,H-4);
+  ctx.restore();
+
+  let maxSup=0;
+  cfuncs.forEach(f=>{
+    let localMax=0;
+    ctx.save();
+    ctx.strokeStyle=f.color; ctx.lineWidth=2;
+    ctx.beginPath();
+    for(let i=0;i<=200;i++){
+      const t=i/200;
+      const y=f.c1*Math.sin(f.f1*Math.PI*t)+f.c2*Math.cos(f.f2*Math.PI*t);
+      localMax=Math.max(localMax,Math.abs(y));
+      const sx=ox+t*xscale, sy=oy-y*yscale;
+      if(i===0) ctx.moveTo(sx,sy); else ctx.lineTo(sx,sy);
+    }
+    ctx.stroke();
+    maxSup=Math.max(maxSup,localMax);
+    ctx.restore();
+  });
+
+  // Sup band
+  ctx.save();
+  ctx.fillStyle='rgba(212,172,13,0.12)';
+  ctx.fillRect(ox,oy-maxSup*yscale,xscale,2*maxSup*yscale);
+  ctx.strokeStyle=COLORS.gold; ctx.lineWidth=1.5; ctx.setLineDash([6,4]);
+  ctx.beginPath(); ctx.moveTo(ox,oy-maxSup*yscale); ctx.lineTo(W-10,oy-maxSup*yscale); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(ox,oy+maxSup*yscale); ctx.lineTo(W-10,oy+maxSup*yscale); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle=COLORS.gold; ctx.font='bold 10px JetBrains Mono';
+  ctx.fillText('‖f‖∞='+maxSup.toFixed(3),W-90,oy-maxSup*yscale-4);
+  ctx.restore();
+}
+(function(){
+  document.getElementById('cf-n')?.addEventListener('input',newCFunc);
+  newCFunc();
+})();
+
+// ============================================================
+// INTERSECTION OBSERVER for scroll animations
+// ============================================================
+const observer=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting) e.target.classList.add('visible');});
+},{threshold:0.08});
+document.querySelectorAll('.section').forEach(s=>observer.observe(s));
+</script>
 </body>
 </html>
-'''
-
-with open('/mnt/agents/output/analyse_part3.html', 'w', encoding='utf-8') as f:
-    f.write(part3)
-
-print("Part 3 written successfully")
-print(f"Length: {len(part3)} characters")
-
-# Assemble the complete file
-with open('/mnt/agents/output/analyse_part1.html', 'r', encoding='utf-8') as f:
-    p1 = f.read()
-with open('/mnt/agents/output/analyse_part2.html', 'r', encoding='utf-8') as f:
-    p2 = f.read()
-with open('/mnt/agents/output/analyse_part3.html', 'r', encoding='utf-8') as f:
-    p3 = f.read()
-
-complete = p1 + p2 + p3
-
-with open('/mnt/agents/output/analyse_fonctionnelle.html', 'w', encoding='utf-8') as f:
-    f.write(complete)
-
-print("COMPLETE FILE ASSEMBLED!")
-print(f"Total length: {len(complete)} characters")
-print(f"Total lines: {len(complete.splitlines())}")
-
-# Also create a summary
-summary = """
-========================================
-  ANALYSE FONCTIONNELLE - COURS HTML
-========================================
-
-FICHIER: analyse_fonctionnelle.html
-TAILLE: {} caracteres
-LIGNES: {}
-
-CONTENU:
---------
-1. CHAPITRE 1: Espaces Vectoriels Normes
-   - Definition des normes
-   - Visualisation: 3 normes usuelles (animation)
-   - Boules ouvertes/fermees (interactive)
-   - Convergence (animation)
-   - Espaces de Banach
-
-2. CHAPITRE 2: Differentielle
-   - Definition formelle
-   - Visualisation: tangente (animation)
-   - Application bilineaire (interactive)
-   - Proprietes fondamentales
-
-3. CHAPITRE 3: Derivees Directionnelles
-   - Definition
-   - Visualisation interactive (tourner la direction)
-   - Surface 3D avec directions
-   - Lien avec le gradient
-
-4. CHAPITRE 4: Norme d'Operateur
-   - Definition
-   - Visualisation: sphere -> ellipsoide
-   - 3 definitions equivalentes
-   - Propriete: L_c(E,F) est Banach
-
-5. CHAPITRE 5: Fonctions Implicites
-   - Theoreme
-   - Visualisation: courbe implicite
-   - Formule de derivation
-   - Exercices resolus
-
-6. EXERCICES INTERACTIFS
-   - 4 exercices avec verification
-   - Simulateur de normes
-
-FONCTIONNALITES:
-----------------
-- Navigation par onglets
-- Animations Canvas
-- Sliders interactifs
-- Verification d'exercices
-- Design responsive
-- Mode sombre
-
-COMMENT UTILISER:
------------------
-1. Telecharger le fichier
-2. Double-cliquer pour ouvrir dans le navigateur
-3. OU faire clic droit -> Ouvrir avec -> Chrome/Firefox
-4. Pas besoin de serveur!
-
-========================================
-""".format(len(complete), len(complete.splitlines()))
-
-print(summary)
